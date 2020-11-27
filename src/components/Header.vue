@@ -18,7 +18,7 @@ export default {
 
 <style lang="scss" scoped>
   .header {
-    height: 36px;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: flex-start;
