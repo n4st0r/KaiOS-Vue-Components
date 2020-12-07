@@ -8,8 +8,10 @@
         <div>
           <div v-for="(tx, index) in transactions" :key="index">
             <div @click="info(tx)" class="transaction-item">
-              <label v-if="tx.tx.Account === account.Account">- {{ tx.tx.Amount }}</label>
-              <label v-if="tx.tx.Account !== account.Account">+ {{ tx.meta.delivered_amount }}</label>
+              <label class="withdrawl" v-if="tx.tx.Account === account.Account">- {{ tx.tx.Amount }}</label>
+              <label class="received" v-if="tx.tx.Account !== account.Account">+ {{ tx.meta.delivered_amount }}</label>
+              <label class="currency" v-if="typeof tx.meta.delivered_amount === 'object'" >{{ tx.meta.delivered_amount.currency }}</label>
+              <label class="currency" v-if="typeof tx.meta.delivered_amount === 'string'">XRP</label>
             </div>
           </div>
         </div>
@@ -59,5 +61,14 @@ export default {
 }
 .transaction-item label {
   cursor: pointer;
+}
+.currency {
+  padding-left: 5px;
+}
+.withdrawl {
+  color: red;
+}
+.received {
+  color: green;
 }
 </style>
