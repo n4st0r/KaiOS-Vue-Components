@@ -46,7 +46,7 @@ export default {
       console.log(account)
     },
     next () {
-      Utils.checkChecksum(position: number, value: number)
+      // Utils.checkChecksum(position: number, value: number)
       if (this.focus === 7) {
         this.num.forEach((element, index) => {
           if (element.length !== 6) {
