@@ -53,18 +53,13 @@ export default {
         default:
           this.eve = event.key
       }
-    },
-    onVisibilityChange (event) {
-      console.log(document.visibilityState)
     }
   },
   mounted () {
     document.addEventListener('keydown', this.onKeyDown)
-    document.addEventListener('visibilitychange', this.onVisibilityChange)
   },
   beforeDestroy () {
     document.removeEventListener('keydown', this.onKeyDown)
-    document.addEventListener('visibilitychange', this.onVisibilityChange)
   }
 }
 </script>

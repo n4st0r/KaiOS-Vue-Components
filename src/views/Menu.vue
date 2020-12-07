@@ -15,7 +15,7 @@ export default {
   data () {
     return {
       height: 666,
-      items: ['QrScanner', 'Generate', 'import1', 'view'],
+      items: ['Wallet', 'QrScanner', 'Generate', 'Import'],
       focusIndex: 0,
       activeElement: 'ListItem'
     }
@@ -37,7 +37,7 @@ export default {
           break
         // case 'ArrowRight':
         case 'Enter':
-        case 'MicrophoneToggle':
+        // case 'MicrophoneToggle':
           var target = event.target.defaultValue
           if (this.items.includes(target)) {
             this.$router.push(target)

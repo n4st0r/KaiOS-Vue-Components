@@ -11,6 +11,8 @@
 import Header from '@/components/Header.vue'
 import Softkey from '@/components/Softkey.vue'
 
+import socket from '@/js/socket.js'
+
 export default {
   components: {
     Header,
@@ -21,9 +23,37 @@ export default {
       softkeys: {
         left: 'back',
         center: 'enter',
-        right: 'null'
+        right: 'toggle'
       }
     }
+  },
+  methods: {
+    async connect () {
+      const ws = await socket.connect()
+      console.log(ws)
+    },
+    async close () {
+      await socket.close()
+    },
+    onVisibilityChange (event) {
+      const state = document.visibilityState
+      switch (state) {
+        case 'hidden':
+          this.close()
+          break
+        case 'visible':
+          if (socket.state() === 3) this.connect()
+          break
+      }
+    }
+  },
+  mounted () {
+    document.addEventListener('visibilitychange', this.onVisibilityChange)
+    this.connect()
+  },
+  beforeDestroy () {
+    document.addEventListener('visibilitychange', this.onVisibilityChange)
+    this.close()
   }
 }
 </script>

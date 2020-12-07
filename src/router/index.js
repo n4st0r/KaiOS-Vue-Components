@@ -4,6 +4,9 @@ import VueRouter from 'vue-router'
 import Menu from '../views/Menu.vue'
 import QR from '../components/Qrscan.vue'
 import Create from '../components/Create.vue'
+import Import from '../components/Import.vue'
+import Wallet from '../views/Wallet.vue'
+import tx from '../views/tx.vue'
 
 Vue.use(VueRouter)
 
@@ -22,6 +25,22 @@ const routes = [
     path: '/Generate',
     name: 'Generate',
     component: Create
+  },
+  {
+    path: '/Import',
+    name: 'Import',
+    component: Import
+  },
+  {
+    path: '/Wallet',
+    name: 'Wallet',
+    component: Wallet
+  },
+  {
+    path: '/transaction',
+    name: 'transaction',
+    component: tx,
+    props: true
   }
   // {
   //   path: '/about',

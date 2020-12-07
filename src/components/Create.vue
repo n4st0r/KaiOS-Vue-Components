@@ -1,18 +1,27 @@
 <template>
     <div style="height: 100%">
-      <label v-if="obj.account">{{ obj.account.address }}</label>
-        <input v-if="isActive" @click="onEnter()" id="createAccount" type="button" :value="'Create XRP Account :)'" ref="createBtn">
-        <ol v-if="!isActive">
+      <input v-if="isActive" @click="onEnter()" id="createAccount" type="button" :value="'Create XRP Account :)'" ref="createBtn">
+      <div v-if="obj.account && !isActive" class="container">
+        <label>{{ obj.account.address }}</label>
+        <div class="row">
+          <ol>
             <li v-for="row in obj.secret" :key="row">{{ row }}</li>
-        </ol>
+          </ol>
+          <VueQrcode :value="obj.account.address" :options="{ width: 115 }"></VueQrcode>
+        </div>
+      </div>
     </div>
 </template>
 
 <script>
 import { Account } from 'xrpl-secret-numbers'
+import VueQrcode from '@chenfengyuan/vue-qrcode'
 
 export default {
   name: 'Create',
+  components: {
+    VueQrcode
+  },
   data () {
     return {
       isActive: true,
@@ -37,11 +46,10 @@ export default {
       }
     },
     press (event) {
-      if (event.key === 'MicrophoneToggle' || event.key === 'Enter') this.onEnter()
+      if (event.key === 'Enter') this.onEnter()
     }
   },
   mounted () {
-    // document.addEventListener('keypress', this.press)
     if (this.$refs.createBtn !== undefined) this.$refs.createBtn.focus()
     if (localStorage.xrp !== undefined) this.obj = JSON.parse(localStorage.xrp)
     if (localStorage.xrp) {
@@ -52,7 +60,7 @@ export default {
     }
   },
   beforeDestroy () {
-    // document.removeEventListener('keypress', this.press)
+
   },
   watch: {
     obj (newXRP) {
@@ -75,5 +83,17 @@ ol {
 }
 label {
   font-size: 12px;
+}
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 100%;
 }
 </style>
