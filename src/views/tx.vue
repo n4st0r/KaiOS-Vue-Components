@@ -83,10 +83,16 @@ export default {
   color: white;
 }
 
+#transaction-time {
+  font-size: 12px;
+  font-style: italic;
+}
+
 #transaction-amount {
   padding: 20px 25px;
   background-color: rgba(77, 79, 102, 0.1);
   border-radius: 26px;
+  margin: 10px 0;
 }
 
 hr {
