@@ -66,21 +66,19 @@ const state = () => {
 }
 
 const command = (com) => {
-  const res = server.send(JSON.stringify(com))
-  console.log(res)
+  server.send(JSON.stringify(com))
 }
 
 var xrpAccount
 
 var subscriptions = []
 const subscribe = (address) => {
+  if (subscriptions.includes(address)) return null
   subscriptions.push(address)
   command({
     command: 'subscribe',
     accounts: [address]
   })
-  console.log('subscribed to: ')
-  console.log(subscriptions)
 }
 
 const getAccountInfo = (address) => {

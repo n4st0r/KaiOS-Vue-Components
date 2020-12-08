@@ -78,9 +78,8 @@ export default {
 </script>
 
 <style scoped>
-
-  #menu {
-    max-height: 100%;
-    overflow: auto;
-  }
+#menu {
+  max-height: 100%;
+  overflow: auto;
+}
 </style>
