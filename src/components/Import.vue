@@ -11,15 +11,19 @@
                   maxlength="6"
                   type="number"
                   ref="importInput"
-                  @click="next()">
-          <input type="button" @click="newAccount()" value="Save" :disabled="!ready" ref="save">
+                  @click="next()"
+                  id="input-secret"
+                  v-bind:class="{ error: error, success: ready}">
+          <input id="save-button" type="button" @click="newAccount()" value="Save" :disabled="!ready" ref="save">
         </div>
       </div>
     </div>
 </template>
 
 <script>
-import { Account } from 'xrpl-secret-numbers'
+import Vue from 'vue'
+import { Account, Utils } from 'xrpl-secret-numbers'
+import socket from '@/js/socket.js'
 
 export default {
   name: 'Import',
@@ -27,7 +31,8 @@ export default {
     return {
       num: ['', '', '', '', '', '', '', ''],
       focus: 0,
-      ready: false
+      ready: false,
+      error: false
     }
   },
   computed: {
@@ -41,16 +46,37 @@ export default {
   },
   methods: {
     newAccount () {
-      const account = new Account(this.secret)
-      localStorage.xrp = JSON.stringify(account)
-      console.log(account)
+      try {
+        const account = new Account(this.secret)
+        localStorage.xrp = JSON.stringify(account)
+        console.log(account)
+        socket.init()
+        this.$notify({
+          group: 'foo',
+          title: 'Imported an XRP Account',
+          type: 'success'
+        })
+        this.$router.push('/')
+      } catch (e) {}
     },
     next () {
-      // Utils.checkChecksum(position: number, value: number)
-      if (this.focus === 7) {
-        this.num.forEach((element, index) => {
+      const index = this.focus
+      if (this.num[index].length < 6) return
+      this.error = false
+      if (!Utils.checkChecksum(index, this.num[index])) {
+        this.$notify({
+          group: 'foo',
+          title: 'Invalid numbers',
+          type: 'error'
+        })
+        this.error = true
+        return false
+      }
+      if (index === 7) {
+        this.num.forEach((element, i) => {
           if (element.length !== 6) {
-            this.focus = index
+            this.focus = i
+            this.error = true
           }
         })
         this.ready = true
@@ -59,21 +85,13 @@ export default {
     },
     onKeyDown (event) {
       switch (event.key) {
-        // case 'SoftLeft':
-        //   this.$router.go(-1)
-        //   break
         case 'Enter':
           this.next()
           break
-        // case 'SoftRight':
-        //   this.$notify({
-        //     group: 'foo',
-        //     title: 'Important message',
-        //     text: 'Hello user!'
-        //   })
-        //   break
-        default:
-          this.eve = event.key
+        case 'SoftRight':
+          var newValue = this.num[this.focus].slice(0, -1)
+          Vue.set(this.num, this.focus, newValue)
+          break
       }
     }
   },
@@ -93,11 +111,25 @@ export default {
   justify-content: space-around;
   align-items: center;
 }
+li {
+  width: 60px;
+}
 label {
   width: 60px;
 }
-input {
+#input-secret {
   width: 60px;
   max-height: 14px;
+  outline-color: blue;
+}
+#input-secret.error {
+  outline-color: red !important;
+}
+#input-secret.success {
+  outline-color: green !important;
+}
+#save-button:focus {
+  color: white;
+  background-color: blue;
 }
 </style>

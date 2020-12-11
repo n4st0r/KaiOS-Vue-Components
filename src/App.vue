@@ -12,6 +12,8 @@ import Header from '@/components/Header.vue'
 import Softkey from '@/components/Softkey.vue'
 
 import socket from '@/js/socket.js'
+// import socket from '@/js/socket-1.js'
+// import store from '@/js/store.js'
 
 export default {
   components: {
@@ -24,7 +26,8 @@ export default {
         left: 'back',
         center: 'enter',
         right: 'toggle'
-      }
+      },
+      init: false
     }
   },
   methods: {

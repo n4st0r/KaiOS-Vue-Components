@@ -72,7 +72,18 @@ export default {
       epoch.setUTCSeconds(this.tx.tx.date)
       const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
       const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-      const date = days[epoch.getDay()] + ', ' + months[epoch.getMonth()] + ' ' + epoch.getDay() + ', ' + epoch.getFullYear() + ' ' + epoch.getHours() + ':' + epoch.getMinutes()
+      const time = function () {
+        let hour = epoch.getHours().toString()
+        let minute = epoch.getMinutes().toString()
+        if (hour.length === 1) {
+          hour = '0' + hour
+        }
+        if (minute.length === 1) {
+          minute = '0' + minute
+        }
+        return `${hour}:${minute}`
+      }
+      const date = days[epoch.getDay()] + ', ' + months[epoch.getMonth()] + ' ' + epoch.getDate() + ', ' + epoch.getFullYear() + ' ' + time()
       return date
     }
   },
@@ -193,6 +204,7 @@ span {
   overflow-wrap: anywhere;
   word-wrap: anywhere;
   word-break: break-all;
+  font-size: 13px;
 }
 
 .arrow {

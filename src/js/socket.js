@@ -1,17 +1,25 @@
 import Vue from 'vue'
 // import RippledWsClient from 'rippled-ws-client'
 import store from './store.js'
-
 const url = 'wss://testnet.xrpl-labs.com'
 // const url = 'wss://xrpl.ws'
 let server
 
+const init = () => {
+  const obj = JSON.parse(localStorage.xrp)
+  const account = obj.account.address
+  subscribe(account)
+  getAccountInfo(account)
+  getAccountTx(account)
+}
+
 const connect = () => {
-  if (server !== undefined && server.readyState === 1) return server
+  if (server !== undefined && state() === 1) return server
   return new Promise((resolve, reject) => {
     server = new WebSocket(url)
 
     server.onopen = () => {
+      init()
       resolve(server)
       console.log('ws opened!')
       Vue.notify({
@@ -23,12 +31,6 @@ const connect = () => {
 
     server.onmessage = (msg) => {
       parseMsg(msg)
-      Vue.notify({
-        group: 'foo',
-        title: 'Message',
-        type: 'warn',
-        text: 'Message from the server'
-      })
     }
 
     server.onerror = (err) => {
@@ -69,9 +71,8 @@ const command = (com) => {
   server.send(JSON.stringify(com))
 }
 
-var xrpAccount
-
 var subscriptions = []
+
 const subscribe = (address) => {
   if (subscriptions.includes(address)) return null
   subscriptions.push(address)
@@ -79,6 +80,7 @@ const subscribe = (address) => {
     command: 'subscribe',
     accounts: [address]
   })
+  console.log('Subscribe: ' + address)
 }
 
 const getAccountInfo = (address) => {
@@ -86,8 +88,7 @@ const getAccountInfo = (address) => {
     command: 'account_info',
     account: address
   })
-  console.log('getAccountInfo')
-  return xrpAccount
+  console.log('getAccountInfo: ' + address)
 }
 
 const getAccountTx = (address) => {
@@ -99,16 +100,50 @@ const getAccountTx = (address) => {
     limit: 100,
     forward: false
   })
-  return null
+  console.log('getAccountTx: ' + address)
 }
 
 function setAccount (account) {
   store.account = account
-  xrpAccount = account
 }
 
 function addTx (tx) {
+  const account = store.account.Account
+  const delivered = tx.meta.delivered_amount
   store.tx.unshift(tx)
+  if (tx.tx.Account !== account) {
+    if (typeof delivered === 'string') {
+      Vue.notify({
+        group: 'foo',
+        type: 'warn',
+        title: 'Outgoing Transaction',
+        text: `Send ${delivered / 1000000} XRP with a new transaction!`
+      })
+    } else {
+      Vue.notify({
+        group: 'foo',
+        type: 'warn',
+        title: 'Outgoing Transaction',
+        text: 'Send a new transaction!'
+      })
+    }
+  } else {
+    if (typeof delivered === 'string') {
+      Vue.notify({
+        group: 'foo',
+        type: 'warn',
+        title: 'Incoming Transaction',
+        text: `Received XRP ${delivered / 1000000} from a new transaction!`
+      })
+    } else {
+      Vue.notify({
+        group: 'foo',
+        type: 'warn',
+        title: 'Incoming Transaction',
+        text: 'Received a new transaction!'
+      })
+    }
+  }
 }
 
 function setTx (arr) {
@@ -132,67 +167,25 @@ const parseMsg = (msg) => {
       setTx(tx)
     }
   } else if (obj.status === 'closed' && obj.type === 'transaction') {
-    var tx = obj.transaction
-    if (typeof tx !== 'undefined') {
-      addTx(tx)
-      // TODO
-      if (this.addresses.includes(tx.Account)) {
-        // getAccountInfo(tx.Account)
-        console.log('send tx')
-        // TODO
-      } if (this.addresses.includes(tx.Destination)) {
-        // getAccountInfo(tx.Destination)
-        console.log('received tx')
+    const tx = obj.transaction
+    const meta = obj.meta
+    if (typeof tx !== 'undefined' && typeof meta !== 'undefined') {
+      const transaction = {
+        meta: meta,
+        tx: tx,
+        validated: false
       }
+      addTx(transaction)
     }
   }
 }
 
 export default {
   connect,
+  init,
   close,
   state,
   subscribe,
   getAccountInfo,
   getAccountTx
 }
-
-// export default new RippledWsClient(url).then(connection => {
-//   connection.on('state', state => {
-//     console.log(state)
-//   })
-//   console.log(connection.getState())
-// })
-
-// const createConnection = () => {
-//   // socket = new WebSocket(url)
-//   new RippledWsClient(url).then(connection => {
-//     socket = connection
-//     console.log(connection.getState())
-//   })
-// }
-
-// createConnection()
-
-//   socket.onopen = function () {
-//     console.log('ws opened!')
-//   }
-
-//   socket.onclose = function (msg) {
-//     console.log('ws closed')
-//     // setTimeout(() => { connect() }, 1000)
-//   }
-
-//   socket.onerror = function (err) {
-//     console.error('Socket encountered error: ', err.message, 'Closing socket')
-//     socket.close()
-//   }
-
-// function sleep () {
-//   ws.close()
-// }
-
-// module.exports = {
-//   ws,
-
-// }

@@ -7,7 +7,7 @@
         <hr>
         <div id="transaction-list" ref="txList">
           <div v-for="(tx, index) in transactions" :key="index" id="transaction-items">
-            <div :tabindex="index" @click="info(tx)" class="transaction-item"  ref="items">
+            <div :class="{ focus: index === focusIndex}" :tabindex="index" @click="info(tx)" class="transaction-item"  ref="items">
               <img src="https://www.flaticon.com/premium-icon/icons/svg/2936/2936758.svg">
               <div id="transaction-text">
                 <label class="transaction-account" v-if="tx.tx.Account === account.Account">{{ tx.tx.Destination }}</label>
@@ -27,7 +27,6 @@
 </template>
 
 <script>
-import socket from '@/js/socket.js'
 import store from '@/js/store.js'
 
 export default {
@@ -63,18 +62,20 @@ export default {
       switch (event.key) {
         case 'ArrowDown':
           this.focusIndex++
+          this.$refs.txList.scrollBy({
+            top: this.$refs.items[0].offsetHeight,
+            left: 0
+          })
           break
         case 'ArrowUp':
           this.focusIndex--
+          this.$refs.txList.scrollBy({
+            top: -this.$refs.items[0].offsetHeight,
+            left: 0
+          })
           break
         case 'Enter':
           this.info(this.transactions[this.focusIndex])
-          // var target = event.target.defaultValue
-          // if (this.items.includes(target)) {
-          //   info (target)
-          // } else {
-          //   console.log(target)
-          // }
           break
         default:
           console.log(event.code)
@@ -87,20 +88,15 @@ export default {
         this.$refs.txList.scrollTop = 0
       } else if (this.focusIndex < 0) {
         this.focusIndex = (length - 1)
+        this.$refs.txList.scrollTop = this.$refs.txList.scrollHeight
       }
-      // console.log(this.focusIndex)
-      this.$refs.items[this.focusIndex].focus()
     }
   },
   created () {
     const obj = JSON.parse(localStorage.xrp)
     this.address = obj.account.address
-    socket.subscribe(this.address)
-    socket.getAccountInfo(this.address)
-    socket.getAccountTx(this.address)
   },
   mounted () {
-    this.$refs.items[0].focus()
     document.addEventListener('keydown', this.onKeyDown)
   },
   beforeDestroy () {
@@ -137,7 +133,7 @@ export default {
   font-size: 14px;
   align-items: center;
 }
-.transaction-item:focus {
+.transaction-item.focus {
   background-color: blue;
   outline: none;
   border: none;
@@ -163,10 +159,10 @@ export default {
   max-width: 300px;
   padding: 0 5px;
 }
-.transaction-item:focus .received {
+.transaction-item.focus .received {
   color: white;
 }
-.transaction-item:focus .withdrawl {
+.transaction-item.focus .withdrawl {
   color: white;
 }
 .transaction-item label {
