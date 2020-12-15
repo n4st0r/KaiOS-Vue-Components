@@ -7,6 +7,7 @@ import Create from '../components/Create.vue'
 import Import from '../components/Import.vue'
 import Wallet from '../views/Wallet.vue'
 import tx from '../views/tx.vue'
+import Setup from '../components/Setup.vue'
 
 Vue.use(VueRouter)
 
@@ -22,6 +23,12 @@ const routes = [
     component: QR
   },
   {
+    path: '/Setup',
+    name: 'Setup',
+    component: Setup,
+    props: true
+  },
+  {
     path: '/Generate',
     name: 'Generate',
     component: Create
@@ -29,7 +36,8 @@ const routes = [
   {
     path: '/Import',
     name: 'Import',
-    component: Import
+    component: Import,
+    props: true
   },
   {
     path: '/Wallet',

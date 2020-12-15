@@ -1,6 +1,6 @@
 <template>
     <div style="height: 100%">
-      <input v-if="isActive" @click="onEnter()" id="createAccount" type="button" :value="'Create XRP Account :)'" ref="createBtn">
+      <input @click="onEnter()" id="createAccount" type="button" :value="'Create/Delete XRP Account :)'" ref="createBtn">
       <div v-if="obj.account && !isActive" class="container">
         <label>{{ obj.account.address }}</label>
         <div class="row">
@@ -10,6 +10,7 @@
           <VueQrcode :value="obj.account.address" :options="{ width: 115 }"></VueQrcode>
         </div>
       </div>
+      {{ test }}
     </div>
 </template>
 
@@ -26,11 +27,7 @@ export default {
     return {
       isActive: true,
       obj: {},
-      xrp: {
-        r: '',
-        s: '',
-        num: []
-      }
+      test: null
     }
   },
   methods: {
@@ -43,29 +40,13 @@ export default {
     onEnter () {
       if (Object.keys(this.obj).length === 0) {
         this.createAccount()
+      } else {
+        this.$router.push({ name: 'Import', params: { account: this.obj } })
       }
-    },
-    press (event) {
-      if (event.key === 'Enter') this.onEnter()
     }
   },
   mounted () {
     if (this.$refs.createBtn !== undefined) this.$refs.createBtn.focus()
-    if (localStorage.xrp !== undefined) this.obj = JSON.parse(localStorage.xrp)
-    if (localStorage.xrp) {
-      this.isActive = false
-      this.xrp = localStorage.xrp
-    } else {
-      this.isActive = true
-    }
-  },
-  beforeDestroy () {
-
-  },
-  watch: {
-    obj (newXRP) {
-      localStorage.xrp = JSON.stringify(newXRP)
-    }
   }
 }
 </script>

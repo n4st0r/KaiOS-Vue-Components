@@ -6,11 +6,13 @@ const url = 'wss://testnet.xrpl-labs.com'
 let server
 
 const init = () => {
-  const obj = JSON.parse(localStorage.xrp)
-  const account = obj.account.address
-  subscribe(account)
-  getAccountInfo(account)
-  getAccountTx(account)
+  const address = getPublicAddress()
+  if (address !== null && address !== undefined) {
+    const account = address
+    subscribe(account)
+    getAccountInfo(account)
+    getAccountTx(account)
+  }
 }
 
 const connect = () => {
@@ -107,6 +109,21 @@ function setAccount (account) {
   store.account = account
 }
 
+const getPublicAddress = () => {
+  const address = localStorage.public
+  if (address !== undefined) {
+    return address
+  } else {
+    return null
+  }
+}
+
+const clear = () => {
+  localStorage.clear()
+  store.account = {}
+  store.tx = []
+}
+
 function addTx (tx) {
   const account = store.account.Account
   const delivered = tx.meta.delivered_amount
@@ -177,6 +194,8 @@ const parseMsg = (msg) => {
       }
       addTx(transaction)
     }
+  } else if (obj.status === 'error' && obj.error === 'actNotFound' && obj.request.command === 'account_info') {
+    setAccount(obj)
   }
 }
 
@@ -187,5 +206,7 @@ export default {
   state,
   subscribe,
   getAccountInfo,
-  getAccountTx
+  getAccountTx,
+  getPublicAddress,
+  clear
 }

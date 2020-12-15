@@ -2,10 +2,11 @@
     <div id="transaction-container">
         <div id="top">
           <label class="account">{{ account.Account }}</label>
-          <label>Balance: {{ dropstoXRP(account.Balance) }} XRP</label>
+          <label v-if="account.Balance">Balance: {{ dropstoXRP(account.Balance) }} XRP</label>
+          <label v-if="account.error === 'actNotFound'">{{ account.account }}</label>
         </div>
         <hr>
-        <div id="transaction-list" ref="txList">
+        <div v-if="transactions" id="transaction-list" ref="txList">
           <div v-for="(tx, index) in transactions" :key="index" id="transaction-items">
             <div :class="{ focus: index === focusIndex}" :tabindex="index" @click="info(tx)" class="transaction-item"  ref="items">
               <img src="https://www.flaticon.com/premium-icon/icons/svg/2936/2936758.svg">
@@ -23,6 +24,9 @@
             </div>
           </div>
         </div>
+      <div v-if="account.error === 'actNotFound'">
+        <p>This is an unactivated account, please send at least 20 XRP to this account to activate it!</p>
+      </div>
     </div>
 </template>
 
@@ -91,10 +95,6 @@ export default {
         this.$refs.txList.scrollTop = this.$refs.txList.scrollHeight
       }
     }
-  },
-  created () {
-    const obj = JSON.parse(localStorage.xrp)
-    this.address = obj.account.address
   },
   mounted () {
     document.addEventListener('keydown', this.onKeyDown)
