@@ -1,5 +1,6 @@
 import Vue from 'vue'
 // import RippledWsClient from 'rippled-ws-client'
+import RippledWsClientSign from 'rippled-ws-client-sign'
 import store from './store.js'
 const url = 'wss://testnet.xrpl-labs.com'
 // const url = 'wss://xrpl.ws'
@@ -118,10 +119,38 @@ const getPublicAddress = () => {
   }
 }
 
+const getSecretKey = () => {
+  const secret = localStorage.secret
+  if (secret !== undefined) {
+    return secret
+  } else {
+    return null
+  }
+}
+
+const signPaymentTransaction = (destination, tag, amount, seed) => {
+  const Transaction = {
+    TransactionType: 'Payment',
+    Account: getPublicAddress(),
+    Destination: destination,
+    DestinationTag: tag,
+    Amount: amount, // Amount in drops, so multiply (6 decimal positions)
+    LastLedgerSequence: null
+  }
+  new RippledWsClientSign(Transaction, seed).then(signedTX => {
+    return signedTX
+  }).catch(error => {
+    console.log('Sign error: ')
+    console.err(error)
+  })
+}
+
 const clear = () => {
   localStorage.clear()
   store.account = {}
   store.tx = []
+  console.log('Cleared all! FUNDS ARE SAFE!')
+  Vue.notify({ group: 'foo', type: 'warn', title: 'FUNDS ARE SAFE!', text: 'Cleared all!' })
 }
 
 function addTx (tx) {
@@ -208,5 +237,7 @@ export default {
   getAccountInfo,
   getAccountTx,
   getPublicAddress,
-  clear
+  clear,
+  getSecretKey,
+  signPaymentTransaction
 }

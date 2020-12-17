@@ -16,7 +16,7 @@
 import socket from '@/js/socket.js'
 import Vue from 'vue'
 
-// account = account object, setup = bolean
+// props[account = account object, setup = bolean]
 export default {
   name: 'setup',
   props: ['account', 'setup'],
@@ -52,11 +52,7 @@ export default {
             socket.clear()
             localStorage.public = address
             localStorage.secret = secret
-            this.$notify({
-              group: 'foo',
-              title: 'Created an Account!',
-              type: 'success'
-            })
+            this.$notify({ group: 'foo', title: 'Created an Account!', type: 'success' })
             socket.init()
             setTimeout(() => this.$router.push('/'), 2000)
           } else {
@@ -72,19 +68,28 @@ export default {
         }
       } else {
         if (this.count === this.tries) this.deleteAccount()
+        const res = this.decrypt(socket.getSecretKey(), this.pin[0])
+        console.log(res)
+        this.$notify({ group: 'foo', title: 'At least you tried', type: 'success' })
       }
       setTimeout(() => this.count++, 500)
       // if setup
       // if (failed)
       // ifcount === 6 delete account else this.count ++
     },
+    decrypt (input, secret) {
+      console.log(`Input: ${input}, secret: ${secret}`)
+      const key = this.$CryptoJS.PBKDF2(secret, this.$CryptoJS.enc.Hex.parse(input.substr(0, 32)) /* Salt */, { keySize: 256 / 32, iterations: 100 })
+      const output = this.$CryptoJS.AES.decrypt(input.substring(64) /* encrypted */, key, { iv: this.$CryptoJS.enc.Hex.parse(input.substr(32, 32)) /* iv */, padding: this.$CryptoJS.pad.Pkcs7, mode: this.$CryptoJS.mode.CBC }).toString(this.$CryptoJS.enc.Utf8)
+      return output
+    },
     encrypt (input, secret) {
       // https://gist.github.com/WietseWind/fd8b0b9e888f58a747e18b31636ad423
+      console.log(`Input: ${input}, secret: ${secret}`)
       const salt = this.$CryptoJS.lib.WordArray.random(128 / 8)
       const iv = this.$CryptoJS.lib.WordArray.random(128 / 8)
-      secret = this.$CryptoJS.enc.Utf8.parse(secret)
-      var encrypted = this.$CryptoJS.AES.encrypt(input, this.$CryptoJS.PBKDF2(secret, salt, { keySize: 256 / 32, iterations: 100 }) /* key */, { iv: iv, padding: this.$CryptoJS.pad.Pkcs7, mode: this.$CryptoJS.mode.CBC })
-      var output = salt.toString() + iv.toString() + encrypted.toString()
+      const encrypted = this.$CryptoJS.AES.encrypt(input, this.$CryptoJS.PBKDF2(secret, salt, { keySize: 256 / 32, iterations: 100 }) /* key */, { iv: iv, padding: this.$CryptoJS.pad.Pkcs7, mode: this.$CryptoJS.mode.CBC })
+      const output = salt.toString() + iv.toString() + encrypted.toString()
       return output
     },
     deleteAccount () {
