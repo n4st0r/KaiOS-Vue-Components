@@ -1,14 +1,14 @@
 <template>
     <div id="body">
         <div id="container">
-            <label v-if="incorrect && !setup">Please try again. {{6 - count}} Tries left.</label>
+            <label v-if="incorrect && !setup">Please try again. {{pin.length - count}} Tries left.</label>
             <label v-if="incorrect && setup">The pin code didn't match. Try again.</label>
             <label>Please enter your PIN</label>
             <div id="bullets">
                 <div v-bind:class="{ bullet: true, fill: pin[count].length >= index }" v-for="index in 6" :key="index"></div>
             </div>
         </div>
-        <input v-model="pin[count]" type="number" hidden>
+        <!-- <input v-model="pin[count]" type="number" hidden> -->
     </div>
 </template>
 
@@ -22,9 +22,8 @@ export default {
   props: ['account', 'setup'],
   data () {
     return {
-      pin: ['', ''],
+      pin: ['', '', '', '', '', ''],
       count: 0,
-      tries: 6,
       incorrect: false
     }
   },
@@ -62,15 +61,22 @@ export default {
               this.count = 0
               Vue.set(this.pin, 0, '')
               Vue.set(this.pin, 1, '')
-            }, 1500)
+            }, 500)
           }
           return null
         }
       } else {
-        if (this.count === this.tries) this.deleteAccount()
-        const res = this.decrypt(socket.getSecretKey(), this.pin[0])
-        console.log(res)
-        this.$notify({ group: 'foo', title: 'At least you tried', type: 'success' })
+        if (this.count === this.pin.length) this.deleteAccount()
+        try {
+          this.decrypt(socket.getSecretKey(), this.pin[this.count])
+          this.$notify({ group: 'foo', title: 'Unlocked!', type: 'success' })
+          return setTimeout(() => this.$router.go(-1), 100)
+        } catch (e) {
+          console.log('Error deriving public address')
+          console.log(e)
+          this.incorrect = true
+          this.$notify({ group: 'foo', title: 'Please try again!', type: 'error' })
+        }
       }
       setTimeout(() => this.count++, 500)
       // if setup
@@ -81,6 +87,7 @@ export default {
       console.log(`Input: ${input}, secret: ${secret}`)
       const key = this.$CryptoJS.PBKDF2(secret, this.$CryptoJS.enc.Hex.parse(input.substr(0, 32)) /* Salt */, { keySize: 256 / 32, iterations: 100 })
       const output = this.$CryptoJS.AES.decrypt(input.substring(64) /* encrypted */, key, { iv: this.$CryptoJS.enc.Hex.parse(input.substr(32, 32)) /* iv */, padding: this.$CryptoJS.pad.Pkcs7, mode: this.$CryptoJS.mode.CBC }).toString(this.$CryptoJS.enc.Utf8)
+      if (!output) throw new Error('The secret did not unlock the string')
       return output
     },
     encrypt (input, secret) {

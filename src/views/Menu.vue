@@ -15,7 +15,7 @@ export default {
   data () {
     return {
       height: 666,
-      items: ['Wallet', 'QrScanner', 'Generate', 'Import', 'Setup'],
+      items: ['Wallet', 'QrScanner', 'Generate', 'Import', 'Contacts'],
       focusIndex: 0,
       activeElement: 'ListItem'
     }

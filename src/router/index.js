@@ -8,6 +8,7 @@ import Import from '../components/Import.vue'
 import Wallet from '../views/Wallet.vue'
 import tx from '../views/tx.vue'
 import Setup from '../components/Setup.vue'
+import Contacts from '../views/Contacts.vue'
 
 Vue.use(VueRouter)
 
@@ -49,6 +50,11 @@ const routes = [
     name: 'transaction',
     component: tx,
     props: true
+  },
+  {
+    path: '/Contacts',
+    name: 'Contacts',
+    component: Contacts
   }
   // {
   //   path: '/about',

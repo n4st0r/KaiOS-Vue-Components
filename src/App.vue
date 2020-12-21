@@ -43,6 +43,7 @@ export default {
       switch (state) {
         case 'hidden':
           this.close()
+          this.$router.push({ name: 'Setup' })
           break
         case 'visible':
           if (socket.state() === 3) this.connect()

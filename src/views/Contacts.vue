@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import socket from '@/js/socket.js'
+// import socket from '@/js/socket.js'
 
 export default {
   name: 'contacts',
@@ -27,6 +27,11 @@ export default {
       focusIndex: 0
     }
   },
+  methods: {
+    setContact () {
+      return null
+    }
+  }
 }
 </script>
 

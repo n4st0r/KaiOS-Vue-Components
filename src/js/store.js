@@ -1,7 +1,9 @@
 import Vue from 'vue'
 
-export default Vue.observable({
+const store = Vue.observable({
   account: {},
   tx: [],
   contacts: {}
 })
+
+export default store
