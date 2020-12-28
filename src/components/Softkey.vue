@@ -1,57 +1,36 @@
 <template>
   <div class="softkey">
-    <label class="left">{{ softkeys.left }}</label>
-    <label class="center">{{ eve }}</label>
-    <label class="right" v-on:SoftRight="back()">{{ softkeys.right }}</label>
+    <label class="left">{{ key.left.string }}</label>
+    <label class="center">{{ key.center.string }}</label>
+    <label class="right">{{ key.right.string }}</label>
+    <!-- v-on:SoftRight="back()" -->
   </div>
 </template>
 
 <script>
+import store from '@/js/store'
+
 export default {
   name: 'Softkey',
-  props: {
-    softkeys: {
-      left: String,
-      center: String,
-      Right: String
-    }
-  },
-  data () {
-    return {
-      eve: 'Null'
+  computed: {
+    key () {
+      return store.keys
     }
   },
   methods: {
-    back () {
-      this.$router.go(-1)
-      console.log('back')
-    },
-    enter (event) {
-      switch (this.$route.name) {
-        case 'Generate':
-          // var target = event.target.defaultValue
-          console.log(event)
-          break
-      }
-    },
     onKeyDown (event) {
       switch (event.key) {
+        case 'ArrowLeft':
         case 'SoftLeft':
-          this.$router.go(-1)
+          this.key.left.fn()
           break
         case 'Enter':
-        case 'MicrophoneToggle':
-          this.enter(event)
+          this.key.center.fn()
           break
+        case 'ArrowRight':
         case 'SoftRight':
-          this.$notify({
-            group: 'foo',
-            title: 'Important message',
-            text: 'Hello user!'
-          })
+          this.key.right.fn()
           break
-        default:
-          this.eve = event.key
       }
     }
   },

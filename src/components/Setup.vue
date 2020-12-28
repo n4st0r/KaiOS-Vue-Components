@@ -1,6 +1,6 @@
 <template>
     <div id="body">
-        <div id="container">
+        <div v-if="!busy" class="container">
             <label v-if="incorrect && !setup">Please try again. {{pin.length - count}} Tries left.</label>
             <label v-if="incorrect && setup">The pin code didn't match. Try again.</label>
             <label>Please enter your PIN</label>
@@ -8,7 +8,9 @@
                 <div v-bind:class="{ bullet: true, fill: pin[count].length >= index }" v-for="index in 6" :key="index"></div>
             </div>
         </div>
-        <!-- <input v-model="pin[count]" type="number" hidden> -->
+        <div class="container" v-else>
+          <img src="https://testnet.xrpl.org/static/media/xrp-loader.1a890ba6.png">
+        </div>
     </div>
 </template>
 
@@ -19,12 +21,13 @@ import Vue from 'vue'
 // props[account = account object, setup = bolean]
 export default {
   name: 'setup',
-  props: ['account', 'setup'],
+  props: ['account', 'setup', 'transaction', 'sign'],
   data () {
     return {
       pin: ['', '', '', '', '', ''],
       count: 0,
-      incorrect: false
+      incorrect: false,
+      busy: false
     }
   },
   methods: {
@@ -42,7 +45,7 @@ export default {
         if (this.pin[this.count].length === 6) this.next()
       }
     },
-    next () {
+    async next () {
       if (this.account !== undefined && this.setup) {
         if (this.count === 1) {
           if (this.pin[0] === this.pin[1]) {
@@ -67,16 +70,34 @@ export default {
         }
       } else {
         if (this.count === this.pin.length) this.deleteAccount()
+        let seed
         try {
-          this.decrypt(socket.getSecretKey(), this.pin[this.count])
-          this.$notify({ group: 'foo', title: 'Unlocked!', type: 'success' })
-          return setTimeout(() => this.$router.go(-1), 100)
+          seed = this.decrypt(socket.getSecretKey(), this.pin[this.count])
         } catch (e) {
           console.log('Error deriving public address')
           console.log(e)
           this.incorrect = true
-          this.$notify({ group: 'foo', title: 'Please try again!', type: 'error' })
+          return this.$notify({ group: 'foo', title: 'Please try again!', type: 'error' })
         }
+        if (this.sign) {
+          try {
+            this.busy = true
+            const signedTX = await socket.signTransaction(this.transaction, seed)
+            // Offline transaction
+            // socket.submitTransaction(signedTX.tx_blob)
+            console.log(signedTX)
+            this.$notify({ group: 'foo', title: 'Signed a TX', type: 'success' })
+            this.$router.push('/')
+          } catch (e) {
+            console.log(e)
+            this.$notify({ group: 'foo', title: 'Error signing the Transaction', type: 'error' })
+            this.$router.go(-1)
+          }
+        } else {
+          console.log(this.sign)
+          this.$notify({ group: 'foo', title: 'Unlocked!', type: 'success' })
+        }
+        return this.$emit('success')
       }
       setTimeout(() => this.count++, 500)
       // if setup
@@ -118,8 +139,9 @@ export default {
 #body {
     display: flex;
     align-items: center;
+    height: 100%;
 }
-#container {
+.container {
     display: flex;
     flex-direction: column;
     align-items: center;

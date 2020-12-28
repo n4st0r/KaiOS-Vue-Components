@@ -55,6 +55,18 @@ const routes = [
     path: '/Contacts',
     name: 'Contacts',
     component: Contacts
+  },
+  {
+    path: '/Contact',
+    name: 'Contact',
+    component: () => import(/* webpackChunkName: "contact" */ '../views/Contact.vue'),
+    props: true
+  },
+  {
+    path: '/Send',
+    name: 'Send',
+    component: () => import(/* webpackChuckName: "Send" */ '../views/Send.vue'),
+    props: true
   }
   // {
   //   path: '/about',

@@ -1,5 +1,5 @@
 <template>
-    <div id="transaction-details" ref="transaction">
+    <div id="transaction-details" v-if="tx" ref="transaction">
         <label id="transaction-type">{{ tx.tx.TransactionType }}</label>
         <label id="transaction-result" v-bind:class="{ success: tx.meta.TransactionResult === 'tesSUCCESS' }" >{{ result(tx.meta.TransactionResult) }}</label>
         <label id="transaction-time">{{ transactionDate }}</label>
@@ -11,8 +11,8 @@
         </div>
         <div id="transaction-memo" v-if="tx.tx.Memos">
           <label class="header"><img src="https://www.flaticon.com/svg/static/icons/svg/40/40064.svg" width="15px" max-height="15px">Memo</label>
-          <label>{{ hextoString(tx.tx.Memos[0].Memo.MemoType) }}: {{ hextoString(tx.tx.Memos[0].Memo.MemoData) }}</label>
-          <label>Format: {{ hextoString(tx.tx.Memos[0].Memo.MemoFormat) }}</label>
+          <label v-if="tx.tx.Memos[0].Memo.MemoType">{{ hextoString(tx.tx.Memos[0].Memo.MemoType) }}: {{ hextoString(tx.tx.Memos[0].Memo.MemoData) }}</label>
+          <label v-if="tx.tx.Memos[0].Memo.MemoFormat">Format: {{ hextoString(tx.tx.Memos[0].Memo.MemoFormat) }}</label>
         </div>
 
         <hr>
@@ -35,6 +35,7 @@
             <div class="column">
               <label class="bold">name here</label>
               <label>{{ tx.tx.Destination }}</label>
+              <label>{{ tx.tx.DestinationTag }}</label>
             </div>
           </div>
         </div>
@@ -93,6 +94,7 @@ export default {
       return xrp
     },
     hextoString (input) {
+      if (!input || input === '') return null
       const output = Buffer.from(input, 'hex')
       return output
     },
@@ -105,10 +107,16 @@ export default {
       }
     }
   },
+  created () {
+    if (!this.tx) this.$router.push({ name: 'Wallet' })
+  },
   mounted () {
     console.log(this.tx)
-
-    this.$refs.transaction.focus()
+    if (this.$refs.transaction) this.$refs.transaction.focus()
+    store.keys.right = {
+      string: 'Add Contact',
+      fn: () => this.$router.push({ name: 'Contact', params: { contact: { name: null, accounts: [{ account: this.tx.tx.Account === this.account.Account ? this.tx.tx.Destination : this.tx.tx.Account, tag: this.tx.tx.DestinationTag }] }, add: true } })
+    }
   }
 }
 </script>

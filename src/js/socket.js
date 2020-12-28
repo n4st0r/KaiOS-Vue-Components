@@ -1,7 +1,8 @@
 import Vue from 'vue'
-// import RippledWsClient from 'rippled-ws-client'
+import RippledWsClient from 'rippled-ws-client'
 import RippledWsClientSign from 'rippled-ws-client-sign'
 import store from './store.js'
+// const url = 'wss://s.devnet.rippletest.net:51233'
 const url = 'wss://testnet.xrpl-labs.com'
 // const url = 'wss://xrpl.ws'
 let server
@@ -11,67 +12,55 @@ const init = () => {
   if (address !== null && address !== undefined) {
     const account = address
     subscribe(account)
-    getAccountInfo(account)
-    getAccountTx(account)
+    setAccountInfo(account)
+    setAccountTx(account)
   }
 }
 
 const connect = () => {
-  if (server !== undefined && state() === 1) return server
+  // if (server !== undefined && state() === 1) return server
+  if (server !== undefined && server.getState().online) return server
   return new Promise((resolve, reject) => {
-    server = new WebSocket(url)
-
-    server.onopen = () => {
-      init()
-      resolve(server)
+    new RippledWsClient(url).then(connection => {
+      server = connection
       console.log('ws opened!')
       Vue.notify({
         group: 'foo',
         title: 'Connected',
         type: 'success'
       })
-    }
 
-    server.onmessage = (msg) => {
-      parseMsg(msg)
-    }
+      init()
 
-    server.onerror = (err) => {
-      reject(err)
-    }
+      server.on('transaction', tx => addTx(tx))
+
+      resolve(connection)
+    }).catch(error => {
+      reject(error)
+      console.log('Error connection to Websocket')
+    })
   })
 }
 
 const close = () => {
   return new Promise((resolve, reject) => {
-    server.onclose = (msg) => {
-      console.log('WebSocket Closed')
+    server.close().then(msg => {
       resolve(msg)
-    }
-
-    server.onerror = (err) => {
-      reject(err)
-    }
-
-    server.close()
+    }).catch(e => reject(e))
   })
 }
 
 const state = () => {
-  switch (server.readyState) {
-    case 0:
-      return 0
-    case 1:
-      return 1
-    case 2:
-      return 2
-    case 3:
-      return 3
-  }
+  return server.getState().online
 }
 
 const command = (com) => {
-  server.send(JSON.stringify(com))
+  console.log(`Command: ${com.command}`)
+  return new Promise((resolve, reject) => {
+    server.send(com).then(msg => {
+      resolve(msg)
+    }).catch(e => reject(e))
+  })
 }
 
 var subscriptions = []
@@ -83,31 +72,27 @@ const subscribe = (address) => {
     command: 'subscribe',
     accounts: [address]
   })
-  console.log('Subscribe: ' + address)
 }
 
-const getAccountInfo = (address) => {
-  command({
-    command: 'account_info',
-    account: address
-  })
-  console.log('getAccountInfo: ' + address)
-}
-
-const getAccountTx = (address) => {
-  command({
+const setAccountTx = async (account) => {
+  const msg = await command({
     command: 'account_tx',
-    account: address,
+    account: account,
     ledger_index_min: -1,
     ledger_index_max: -1,
     limit: 100,
     forward: false
   })
-  console.log('getAccountTx: ' + address)
+  store.tx = msg.transactions
 }
 
-function setAccount (account) {
-  store.account = account
+const setAccountInfo = async (account) => {
+  const msg = await command({
+    command: 'account_info',
+    account: account
+  })
+  if (msg.account_data) store.account = msg.account_data
+  else store.account = msg
 }
 
 const getPublicAddress = () => {
@@ -119,6 +104,10 @@ const getPublicAddress = () => {
   }
 }
 
+const getAccountBalance = () => {
+  return store.account.Balance
+}
+
 const getSecretKey = () => {
   const secret = localStorage.secret
   if (secret !== undefined) {
@@ -128,20 +117,16 @@ const getSecretKey = () => {
   }
 }
 
-const signPaymentTransaction = (destination, tag, amount, seed) => {
-  const Transaction = {
-    TransactionType: 'Payment',
-    Account: getPublicAddress(),
-    Destination: destination,
-    DestinationTag: tag,
-    Amount: amount, // Amount in drops, so multiply (6 decimal positions)
-    LastLedgerSequence: null
-  }
-  new RippledWsClientSign(Transaction, seed).then(signedTX => {
-    return signedTX
-  }).catch(error => {
-    console.log('Sign error: ')
-    console.err(error)
+const signTransaction = (transaction, seed) => {
+  console.log(transaction)
+  console.log(seed)
+  return new Promise((resolve, reject) => {
+    new RippledWsClientSign(transaction, seed, server).then(signedTX => {
+      resolve(signedTX)
+    }).catch(error => {
+      console.log(error)
+      reject(error)
+    })
   })
 }
 
@@ -153,11 +138,25 @@ const clear = () => {
   Vue.notify({ group: 'foo', type: 'warn', title: 'FUNDS ARE SAFE!', text: 'Cleared all!' })
 }
 
-function addTx (tx) {
+const clone = (obj) => Object.assign({}, obj)
+const renameKey = (object, key, newKey) => {
+  const clonedObj = clone(object)
+  const targetKey = clonedObj[key]
+
+  delete clonedObj[key]
+  clonedObj[newKey] = targetKey
+  return clonedObj
+}
+
+const addTx = (tx) => {
+  console.log('Received a TX')
+  console.log(tx)
   const account = store.account.Account
   const delivered = tx.meta.delivered_amount
+
+  tx = renameKey(tx, 'transaction', 'tx')
   store.tx.unshift(tx)
-  if (tx.tx.Account !== account) {
+  if (tx.Account !== account) {
     if (typeof delivered === 'string') {
       Vue.notify({
         group: 'foo',
@@ -192,41 +191,38 @@ function addTx (tx) {
   }
 }
 
-function setTx (arr) {
-  store.tx = arr
-}
+// const parseMsg = (msg) => {
+//   const obj = msg
+//   // const obj = JSON.parse(msg.data)
+//   console.log(obj)
 
-const parseMsg = (msg) => {
-  const obj = JSON.parse(msg.data)
-  console.log(obj)
-
-  if (obj.status === 'success') {
-    const result = obj.result
-    if (typeof result.account_data !== 'undefined') {
-      const account = result.account_data
-      // TODO
-      // this.setAmount(acc.Account, acc.Balance)
-      setAccount(account)
-    } else if (typeof result.transactions !== 'undefined') {
-      const tx = result.transactions
-      // const address = res.account
-      setTx(tx)
-    }
-  } else if (obj.status === 'closed' && obj.type === 'transaction') {
-    const tx = obj.transaction
-    const meta = obj.meta
-    if (typeof tx !== 'undefined' && typeof meta !== 'undefined') {
-      const transaction = {
-        meta: meta,
-        tx: tx,
-        validated: false
-      }
-      addTx(transaction)
-    }
-  } else if (obj.status === 'error' && obj.error === 'actNotFound' && obj.request.command === 'account_info') {
-    setAccount(obj)
-  }
-}
+//   if (obj.status === 'success') {
+//     const result = obj.result
+//     if (typeof result.account_data !== 'undefined') {
+//       const account = result.account_data
+//       // TODO
+//       // this.setAmount(acc.Account, acc.Balance)
+//       setAccount(account)
+//     } else if (typeof result.transactions !== 'undefined') {
+//       const tx = result.transactions
+//       // const address = res.account
+//       setTx(tx)
+//     }
+//   } else if (obj.status === 'closed' && obj.type === 'transaction') {
+//     const tx = obj.transaction
+//     const meta = obj.meta
+//     if (typeof tx !== 'undefined' && typeof meta !== 'undefined') {
+//       const transaction = {
+//         meta: meta,
+//         tx: tx,
+//         validated: false
+//       }
+//       addTx(transaction)
+//     }
+//   } else if (obj.status === 'error' && obj.error === 'actNotFound' && obj.request.command === 'account_info') {
+//     setAccount(obj)
+//   }
+// }
 
 export default {
   connect,
@@ -234,10 +230,11 @@ export default {
   close,
   state,
   subscribe,
-  getAccountInfo,
-  getAccountTx,
+  setAccountInfo,
+  setAccountTx,
   getPublicAddress,
   clear,
   getSecretKey,
-  signPaymentTransaction
+  signTransaction,
+  getAccountBalance
 }
