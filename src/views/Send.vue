@@ -23,7 +23,7 @@
                 </div>
             </div>
             <hr>
-            <div tabindex="-1" id="asset" ref="input2">
+            <div tabindex="-1" id="asset" class="prevent" ref="input2">
                 <label>Asset</label>
                 <label>XRP</label>
                 <label>Available: {{ balance / 1000000 }}</label>
@@ -31,12 +31,12 @@
             <hr>
             <div id="amount">
                 <label>Amount</label>
-                <input v-model="Amount" class="number" id="xrp" type="number" min=".000001" placeholder="Amount" ref="input3">
+                <input v-model="Amount" class="prevent" id="xrp" type="number" min=".000001" placeholder="Amount" ref="input3">
             </div>
             <hr>
             <div id="memo">
                 <label>Memo</label>
-                <input v-model="Memo" maxlength="150" placeholder="Public Memo" ref="input4">
+                <input v-model="Memo" maxlength="150" placeholder="Public Memo" class="prevent" ref="input4">
             </div>
             <input type="button" value="Send &amp; Sign" @click="signTransaction()" ref="input5">
         </div>
@@ -45,7 +45,7 @@
 </template>
 
 <script>
-// import store from '@/js/store.js'
+import store from '@/js/store.js'
 import socket from '@/js/socket.js'
 import Setup from '@/components/Setup.vue'
 
@@ -154,13 +154,15 @@ export default {
     this.Destination = this.account
     this.DestinationTag = this.tag
     this.Account = this.address
+    store.keys.center.fn = () => { return null }
   },
   mounted () {
     document.addEventListener('keydown', this.onKeyDown)
-    console.log()
-    document.getElementsByClassName('number').forEach(element => {
+    document.getElementsByClassName('prevent').forEach(element => {
       element.addEventListener('keydown', e => {
         if (e.which === 38 || e.which === 40) e.preventDefault()
+        // if (e.key === 'SoftRight')
+        // console.log(e)
       })
     })
     this.$refs.input0.focus()
@@ -176,6 +178,9 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
+    height: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 .transaction-item {
     display: flex;

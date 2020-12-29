@@ -20,14 +20,14 @@ export default {
   methods: {
     onKeyDown (event) {
       switch (event.key) {
-        case 'ArrowLeft':
+        // case 'ArrowLeft':
         case 'SoftLeft':
           this.key.left.fn()
           break
         case 'Enter':
           this.key.center.fn()
           break
-        case 'ArrowRight':
+        // case 'ArrowRight':
         case 'SoftRight':
           this.key.right.fn()
           break

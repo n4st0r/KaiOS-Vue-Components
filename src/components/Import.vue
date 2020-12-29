@@ -25,6 +25,7 @@
 <script>
 import Vue from 'vue'
 import { Account, Utils } from 'xrpl-secret-numbers'
+import store from '@/js/store'
 
 export default {
   name: 'Import',
@@ -85,10 +86,6 @@ export default {
         case 'Enter':
           this.next()
           break
-        case 'SoftRight':
-          var newValue = this.num[this.focus].slice(0, -1)
-          Vue.set(this.num, this.focus, newValue)
-          break
       }
     }
   },
@@ -98,6 +95,11 @@ export default {
 
     this.$refs.importInput.focus()
     document.addEventListener('keydown', this.onKeyDown)
+    store.keys.right.string = 'delete'
+    store.keys.right.fn = () => {
+      var newValue = this.num[this.focus].slice(0, -1)
+      Vue.set(this.num, this.focus, newValue)
+    }
   },
   beforeDestroy () {
     document.removeEventListener('keydown', this.onKeyDown)

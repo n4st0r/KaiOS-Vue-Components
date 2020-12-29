@@ -2,14 +2,14 @@
     <div class="container">
         <label>Contacts</label>
         <div v-if="contacts" id="contacts-list" ref="contactList">
-            <div v-for="(contact, index) in contacts" :key="index" id="contact-items">
-                <div :class="{ focus: index === focusIndex}" :tabindex="index" @click="info(contact)" class="contact-item"  ref="items">
+            <div v-for="(contact, key, index) in contacts" :key="index" id="contact-items">
+                <div :class="{ focus: index === focusIndex }" :tabindex="index" @click="info(contact)" class="contact-item"  ref="items">
                 <img src="https://www.flaticon.com/svg/static/icons/svg/1077/1077012.svg">
                 <div class="contact-text">
                     <label class="contact-account">{{ contact.name }}</label>
                 </div>
                 <div class="contact-amount">
-                        <label class="withdrawl">{{ contact.accounts[0].account }}</label>
+                        <label class="withdrawl">{{ key }}</label>
                     </div>
                 </div>
             </div>
@@ -18,7 +18,6 @@
 </template>
 
 <script>
-// import socket from '@/js/socket.js'
 import store from '@/js/store.js'
 
 export default {
@@ -30,7 +29,7 @@ export default {
   },
   computed: {
     contacts () {
-      return store.contacts.sort((a, b) => a.name.localeCompare(b.name))
+      return store.contacts
     }
   },
   methods: {
@@ -61,13 +60,13 @@ export default {
             left: 0
           })
           break
-        case 'Enter':
-          this.info(this.contacts[this.focusIndex])
-          break
-        case 'SoftRight':
-        case 'ArrowRight':
-          this.add()
-          break
+        // case 'Enter':
+        //   this.info(this.contacts[this.focusIndex])
+        //   break
+        // case 'SoftRight':
+        // case 'ArrowRight':
+        //   this.add()
+        //   break
       }
       this.focusInput(this.contacts.length)
     },
@@ -82,6 +81,12 @@ export default {
     }
   },
   mounted () {
+    // ;
+    store.keys.center.fn = () => this.$router.push({ name: 'Contact', params: { contact: this.contacts[Object.keys(this.contacts)[this.focusIndex]] } })
+    store.keys.right = {
+      string: 'Add',
+      fn: () => this.$router.push({ name: 'Contact', params: { add: true } })
+    }
     document.addEventListener('keydown', this.onKeyDown)
   },
   beforeDestroy () {

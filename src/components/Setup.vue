@@ -31,6 +31,12 @@ export default {
     }
   },
   methods: {
+    fail () {
+      if (this.count === this.pin.length) this.deleteAccount()
+      this.$notify({ group: 'foo', title: 'Please try again!', type: 'error' })
+      this.incorrect = true
+      setTimeout(() => this.count++, 500)
+    },
     onKeyDown (event) {
       switch (event.key) {
         case 'Enter':
@@ -69,15 +75,13 @@ export default {
           return null
         }
       } else {
-        if (this.count === this.pin.length) this.deleteAccount()
         let seed
         try {
           seed = this.decrypt(socket.getSecretKey(), this.pin[this.count])
         } catch (e) {
           console.log('Error deriving public address')
           console.log(e)
-          this.incorrect = true
-          return this.$notify({ group: 'foo', title: 'Please try again!', type: 'error' })
+          return this.fail()
         }
         if (this.sign) {
           try {

@@ -68,8 +68,9 @@ export default {
 </script>
 
 <style lang="scss">
+@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
   html, body, #root {
-    font-family: "Open Sans", sans-serif;
+    font-family: 'Montserrat', sans-serif;
     margin: 0;
     display: flex;
     flex-direction: column;

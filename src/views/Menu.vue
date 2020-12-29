@@ -6,6 +6,7 @@
 
 <script>
 import ListItem from '@/components/ListItem.vue'
+import store from '@/js/store'
 
 export default {
   name: 'Menu',
@@ -46,8 +47,6 @@ export default {
             console.log(target)
           }
           break
-        default:
-          console.log(event.code)
       }
       this.focusInput(this.items.length)
     },
@@ -67,6 +66,15 @@ export default {
     }
   },
   mounted () {
+    store.keys.left = {
+      string: 'Options',
+      fn: () => { return null }
+    }
+    store.keys.center.fn = () => { return null }
+    store.keys.right = {
+      string: 'Scan',
+      fn: () => this.$router.push({ name: 'QR' })
+    }
     this.$refs.items[0].$el.focus()
     this.matchHeight()
     document.addEventListener('keydown', this.onKeyDown)

@@ -1,6 +1,6 @@
 <template>
     <div style="height: 100%">
-      <input @click="onEnter()" id="createAccount" type="button" :value="'Create/Delete XRP Account :)'" ref="createBtn">
+      <input @click="onEnter()" id="createAccount" type="button" :value="'Create XRP Account'" ref="createBtn">
       <div v-if="obj.account && !isActive" class="container">
         <label>{{ obj.account.address }}</label>
         <div class="row">

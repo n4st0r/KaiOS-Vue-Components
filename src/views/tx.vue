@@ -11,7 +11,7 @@
         </div>
         <div id="transaction-memo" v-if="tx.tx.Memos">
           <label class="header"><img src="https://www.flaticon.com/svg/static/icons/svg/40/40064.svg" width="15px" max-height="15px">Memo</label>
-          <label v-if="tx.tx.Memos[0].Memo.MemoType">{{ hextoString(tx.tx.Memos[0].Memo.MemoType) }}: {{ hextoString(tx.tx.Memos[0].Memo.MemoData) }}</label>
+          <label v-if="tx.tx.Memos[0].Memo.MemoData || tx.tx.Memos[0].Memo.MemoType">{{ hextoString(tx.tx.Memos[0].Memo.MemoType) }} {{ hextoString(tx.tx.Memos[0].Memo.MemoData) }}</label>
           <label v-if="tx.tx.Memos[0].Memo.MemoFormat">Format: {{ hextoString(tx.tx.Memos[0].Memo.MemoFormat) }}</label>
         </div>
 
@@ -23,7 +23,7 @@
           <div class="account">
             <img src="https://www.flaticon.com/svg/static/icons/svg/214/214362.svg" width="25px" max-height="25px">
             <div class="column">
-              <label class="bold">name here</label>
+              <label class="bold">{{ getAccountName(tx.tx.Account) }}</label>
               <label>{{ tx.tx.Account }}</label>
             </div>
           </div>
@@ -33,7 +33,7 @@
           <div class="account">
             <img src="https://www.flaticon.com/svg/static/icons/svg/214/214362.svg" width="25px" max-height="25px">
             <div class="column">
-              <label class="bold">name here</label>
+              <label class="bold">{{ getAccountName(tx.tx.Destination) }}</label>
               <label>{{ tx.tx.Destination }}</label>
               <label>{{ tx.tx.DestinationTag }}</label>
             </div>
@@ -89,6 +89,14 @@ export default {
     }
   },
   methods: {
+    getAccountName (account) {
+      if (store.account.Account === account) return 'My Wallet'
+      else {
+        const contact = store.contacts[account]
+        if (contact) return contact.name
+        else return null
+      }
+    },
     dropstoXRP (drops) {
       const xrp = drops / 1000000
       return xrp

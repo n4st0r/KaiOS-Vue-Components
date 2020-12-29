@@ -7,12 +7,12 @@
         <hr>
         <fieldset>
             <label>Address:</label>
-            <input v-model="contactobj.accounts[0].account" placeholder="R Address" ref="input1">
-            <input v-model="contactobj.accounts[0].tag" class="number" type="number" placeholder="Destination Tag" ref="input2">
+            <input v-model="contactobj.account" class="prevent" placeholder="R Address" ref="input1">
+            <input v-model="contactobj.tag" class="prevent" type="number" placeholder="Destination Tag" ref="input2">
         </fieldset>
         <hr>
         <div id="buttons">
-            <input type="button" value="Delete" ref="input3">
+            <input type="button" class="prevent" value="Delete" ref="input3">
             <input type="button" value="Save" ref="input4">
             <input type="button" value="Send" ref="input5">
         </div>
@@ -20,6 +20,9 @@
 </template>
 
 <script>
+import store from '@/js/store'
+import Vue from 'vue'
+
 export default {
   props: ['contact', 'add'],
   data () {
@@ -58,7 +61,7 @@ export default {
               this.setContact()
               break
             case 5:
-              this.$router.push({ name: 'Send', params: { account: this.contactobj.accounts[0].account, tag: this.contactobj.accounts[0].tag } })
+              this.$router.push({ name: 'Send', params: { account: this.contactobj.account, tag: this.contactobj.tag } })
           }
           break
         }
@@ -78,14 +81,39 @@ export default {
     }
   },
   created () {
+    store.keys.left = {
+      string: 'Back',
+      fn: () => this.$route.push({ name: 'Setup' })
+    }
+    store.keys.right = {
+      string: 'del',
+      fn: () => {
+        if (this.focusIndex >= 3) return null
+        var newValue
+        if (this.focusIndex === 0) {
+          newValue = this.contactobj.name.slice(0, -1)
+          Vue.set(this.contactobj, 'name', newValue)
+        }
+        if (this.focusIndex === 1) {
+          newValue = this.contactobj.account.slice(0, -1)
+          Vue.set(this.contactobj, 'account', newValue)
+        }
+        if (this.focusIndex === 2) {
+          newValue = this.contactobj.tag.slice(0, -1)
+          Vue.set(this.contactobj, 'tag', newValue)
+        }
+      }
+    }
     if (!this.contact && !this.add) this.$router.push({ name: 'Contacts' })
     else if (this.contact) this.contactobj = this.contact
   },
   mounted () {
     document.addEventListener('keydown', this.onKeyDown)
-    document.getElementsByClassName('number').forEach(element => {
+    document.getElementsByClassName('prevent').forEach(element => {
       element.addEventListener('keydown', e => {
-        if (e.which === 38 || e.which === 40) e.preventDefault()
+        if (e.which === 38 || e.which === 40) {
+          e.preventDefault()
+        }
       })
     })
     if (this.$refs.input0) this.$refs.input0.focus()
@@ -103,13 +131,14 @@ export default {
     align-items: center;
     height: 100%;
     width: 100%;
-    overflow-y: scroll;
+    overflow-y: hidden;
     overflow-x: hidden;
   }
 fieldset {
     display: flex;
     flex-direction: column;
     border: none;
+    padding: 0;
 }
 fieldset label {
     margin: 6px;

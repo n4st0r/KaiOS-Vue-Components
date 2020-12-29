@@ -18,29 +18,41 @@ const store = Vue.observable({
   },
   account: {},
   tx: [],
-  contacts: [
-    {
-      id: 'id',
-      name: 'Santa',
-      accounts: [
-        { account: 'rh5juM8LsHPw5doRJopaihzqn2pJnRVBNr', tag: 89416 }
-      ]
+  contacts: {
+    rXXXXXXXXXXX: {
+      account: 'rXXXXXXXXXXX',
+      name: 'Ted',
+      tag: ''
     },
-    {
-      id: 'id1',
-      name: 'Rudolph',
-      accounts: [
-        { account: 'rh5juM8LsHPw5doRJopaihzqn2pJnRVBNr', tag: 89416 }
-      ]
-    },
-    {
-      id: 'id2',
+    rh5juM8LsHPw5doRJopaihzqn2pJnRVBNr: {
+      account: 'rh5juM8LsHPw5doRJopaihzqn2pJnRVBNr',
       name: 'Antonio',
-      accounts: [
-        { account: 'rh5juM8LsHPw5doRJopaihzqn2pJnRVBNr' }
-      ]
+      tag: 123456
     }
-  ]
+  }
+  // contacts: [
+  //   {
+  //     id: 'id',
+  //     name: 'Santa',
+  //     accounts: [
+  //       { account: 'rh5juM8LsHPw5doRJopaihzqn2pJnRVBNr', tag: 89416 }
+  //     ]
+  //   },
+  //   {
+  //     id: 'id1',
+  //     name: 'Rudolph',
+  //     accounts: [
+  //       { account: 'rh5juM8LsHPw5doRJopaihzqn2pJnRVBNr', tag: 89416 }
+  //     ]
+  //   },
+  //   {
+  //     id: 'id2',
+  //     name: 'Antonio',
+  //     accounts: [
+  //       { account: 'rh5juM8LsHPw5doRJopaihzqn2pJnRVBNr' }
+  //     ]
+  //   }
+  // ]
 })
 
 export default store

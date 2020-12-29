@@ -11,8 +11,8 @@
           <div :class="{ focus: index === focusIndex}" :tabindex="index" @click="info(tx)" class="transaction-item"  ref="items">
             <img src="https://www.flaticon.com/premium-icon/icons/svg/2936/2936758.svg">
             <div id="transaction-text">
-              <label class="transaction-account" v-if="tx.tx.Account === account.Account">{{ tx.tx.Destination }}</label>
-              <label class="transaction-account" v-if="tx.tx.Account !== account.Account">{{ tx.tx.Account }}</label>
+              <label class="transaction-account" v-if="tx.tx.Account === account.Account">{{ getAccountName(tx.tx.Destination) }}</label>
+              <label class="transaction-account" v-if="tx.tx.Account !== account.Account">{{ getAccountName(tx.tx.Account) }}</label>
               <label>{{ tx.tx.TransactionType }}</label>
             </div>
             <div class="transaction-amount">
@@ -49,14 +49,11 @@ export default {
       return store.tx
     }
   },
-  // watch: {
-  //   transactions (list) {
-  //     this.$refs.items[0].focus()
-  //   }
-  // },
   methods: {
-    getAccountName (tx) {
-
+    getAccountName (account) {
+      const contact = store.contacts[account]
+      if (contact) return contact.name
+      else return account
     },
     dropstoXRP (drops) {
       const xrp = drops / 1000000
