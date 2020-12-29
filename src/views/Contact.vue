@@ -1,5 +1,5 @@
 <template>
-    <div v-if="contactobj" class=container>
+    <div v-if="contactobj" class="container">
         <fieldset>
             <label>Name:</label>
             <input v-model="contactobj.name" placeholder="Contact Name" ref="input0">
@@ -100,7 +100,12 @@ export default {
 .container {
     display: flex;
     flex-direction: column;
-}
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+  }
 fieldset {
     display: flex;
     flex-direction: column;

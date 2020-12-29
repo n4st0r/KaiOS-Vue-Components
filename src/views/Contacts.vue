@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="container">
         <label>Contacts</label>
         <div v-if="contacts" id="contacts-list" ref="contactList">
             <div v-for="(contact, index) in contacts" :key="index" id="contact-items">
@@ -95,6 +95,7 @@ export default {
   overflow-y: auto;
   overflow-x: hidden;
   height: 100%;
+  width: 100%;
 }
 img {
     height: 25px;
