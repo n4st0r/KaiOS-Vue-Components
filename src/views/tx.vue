@@ -123,7 +123,7 @@ export default {
     if (this.$refs.transaction) this.$refs.transaction.focus()
     store.keys.right = {
       string: 'Add Contact',
-      fn: () => this.$router.push({ name: 'Contact', params: { contact: { name: null, accounts: [{ account: this.tx.tx.Account === this.account.Account ? this.tx.tx.Destination : this.tx.tx.Account, tag: this.tx.tx.DestinationTag }] }, add: true } })
+      fn: () => this.$router.push({ name: 'Contact', params: { contact: { name: null, account: this.tx.tx.Account === this.account.Account ? this.tx.tx.Destination : this.tx.tx.Account, tag: this.tx.tx.DestinationTag }, add: true } })
     }
   }
 }

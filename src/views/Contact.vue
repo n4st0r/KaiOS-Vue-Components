@@ -30,9 +30,8 @@ export default {
       focusIndex: 0,
       contactobj: {
         name: null,
-        accounts: [
-          { account: null, tag: null }
-        ]
+        account: null,
+        tag: null
       }
     }
   },
@@ -52,19 +51,6 @@ export default {
         case 'ArrowUp':
           this.focusIndex--
           break
-        // case 'Enter': {
-        //   switch (this.focusIndex) {
-        //     case 3:
-        //       this.deleteContact()
-        //       break
-        //     case 4:
-        //       this.setContact()
-        //       break
-        //     case 5:
-        //       this.$router.push({ name: 'Send', params: { account: this.contactobj.account, tag: this.contactobj.tag } })
-        //   }
-        //   break
-        // }
       }
       this.focusInput(Object.keys(this.$refs).length)
     },
