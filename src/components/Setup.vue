@@ -15,6 +15,7 @@
 </template>
 
 <script>
+import store from '@/js/store'
 import socket from '@/js/socket.js'
 import Vue from 'vue'
 
@@ -132,6 +133,10 @@ export default {
     }
   },
   mounted () {
+    store.keys.right = {
+      string: 'del',
+      fn: () => Vue.set(this.pin, this.count, this.pin[this.count].slice(0, -1))
+    }
     if (!this.setup) {
       const tries = localStorage.tries
       if (tries && tries >= 1) {

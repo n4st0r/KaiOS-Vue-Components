@@ -101,6 +101,10 @@ export default {
       string: 'Back',
       fn: () => this.$router.push('/')
     }
+    store.keys.right = {
+      string: 'QR',
+      fn: () => this.$router.push({ name: 'QRview', params: { string: this.account.Account } })
+    }
     document.addEventListener('keydown', this.onKeyDown)
   },
   beforeDestroy () {

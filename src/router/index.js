@@ -46,6 +46,12 @@ const routes = [
     component: Wallet
   },
   {
+    path: '/QR',
+    name: 'QRview',
+    component: () => import(/* webpackChunkName: "QRview" */ '../views/QRview.vue'),
+    props: true
+  },
+  {
     path: '/transaction',
     name: 'transaction',
     component: tx,
