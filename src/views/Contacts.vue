@@ -68,7 +68,7 @@ export default {
         //   this.add()
         //   break
       }
-      this.focusInput(this.contacts.length)
+      this.focusInput(Object.keys(this.contacts).length)
     },
     focusInput (length) {
       if (this.focusIndex >= length) {
@@ -81,7 +81,10 @@ export default {
     }
   },
   mounted () {
-    // ;
+    store.keys.left = {
+      string: 'Back',
+      fn: () => this.$router.push('/')
+    }
     store.keys.center.fn = () => this.$router.push({ name: 'Contact', params: { contact: this.contacts[Object.keys(this.contacts)[this.focusIndex]] } })
     store.keys.right = {
       string: 'Add',

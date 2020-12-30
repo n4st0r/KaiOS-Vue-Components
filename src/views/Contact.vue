@@ -52,21 +52,19 @@ export default {
         case 'ArrowUp':
           this.focusIndex--
           break
-        case 'Enter': {
-          switch (this.focusIndex) {
-            case 3:
-              this.deleteContact()
-              break
-            case 4:
-              this.setContact()
-              break
-            case 5:
-              this.$router.push({ name: 'Send', params: { account: this.contactobj.account, tag: this.contactobj.tag } })
-          }
-          break
-        }
-        default:
-          console.log(event.code)
+        // case 'Enter': {
+        //   switch (this.focusIndex) {
+        //     case 3:
+        //       this.deleteContact()
+        //       break
+        //     case 4:
+        //       this.setContact()
+        //       break
+        //     case 5:
+        //       this.$router.push({ name: 'Send', params: { account: this.contactobj.account, tag: this.contactobj.tag } })
+        //   }
+        //   break
+        // }
       }
       this.focusInput(Object.keys(this.$refs).length)
     },
@@ -83,7 +81,19 @@ export default {
   created () {
     store.keys.left = {
       string: 'Back',
-      fn: () => this.$route.push({ name: 'Setup' })
+      fn: () => this.$route.go(-1)
+    }
+    store.keys.center.fn = () => {
+      switch (this.focusIndex) {
+        case 3:
+          this.deleteContact()
+          break
+        case 4:
+          this.setContact()
+          break
+        case 5:
+          this.$router.push({ name: 'Send', params: { account: this.contactobj.account, tag: this.contactobj.tag } })
+      }
     }
     store.keys.right = {
       string: 'del',
