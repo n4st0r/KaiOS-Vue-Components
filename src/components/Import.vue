@@ -14,7 +14,8 @@
                   ref="importInput"
                   @click="next()"
                   id="input-secret"
-                  v-bind:class="{ error: error, success: ready}">
+                  v-bind:class="{ error: error, success: ready }"
+                  class="prevent">
           <input id="save-button" type="button" @click="newAccount()" value="Save" :disabled="!ready" ref="save">
         </div>
       </div>
@@ -92,7 +93,18 @@ export default {
   mounted () {
     // TODO DELTE ME! Only for test purposes
     // this.num = this.account.secret
+    document.getElementsByClassName('prevent').forEach(element => {
+      element.addEventListener('keydown', e => {
+        if (e.which === 38 || e.which === 40) {
+          e.preventDefault()
+        }
+      })
+    })
 
+    store.keys.left = {
+      string: 'Back',
+      fn: () => this.$router.go(-1)
+    }
     this.$refs.importInput.focus()
     document.addEventListener('keydown', this.onKeyDown)
     store.keys.right.string = 'delete'

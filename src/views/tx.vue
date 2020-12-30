@@ -117,6 +117,10 @@ export default {
   },
   created () {
     if (!this.tx) this.$router.push({ name: 'Wallet' })
+    store.keys.left = {
+      string: 'Back',
+      fn: () => this.$router.go(-1)
+    }
   },
   mounted () {
     console.log(this.tx)

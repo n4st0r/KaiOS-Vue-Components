@@ -67,7 +67,7 @@ export default {
   created () {
     store.keys.left = {
       string: 'Back',
-      fn: () => this.$route.go(-1)
+      fn: () => this.$router.go(-1)
     }
     store.keys.center.fn = () => {
       switch (this.focusIndex) {
