@@ -7,6 +7,7 @@
 // import { QrcodeStream } from 'vue-qrcode-reader'
 import VueQrcode from '@chenfengyuan/vue-qrcode'
 import socket from '@/js/socket.js'
+import store from '@/js/store'
 
 export default {
   name: 'qrscanner',
@@ -29,6 +30,12 @@ export default {
       const seed = 'sXXX'
       const signedTX = socket.signPaymentTransaction(this.destination, this.tag, this.amount, seed)
       console.log(signedTX)
+    }
+  },
+  created () {
+    store.keys.left = {
+      string: 'Back',
+      fn: () => this.$router.push('/')
     }
   }
 }

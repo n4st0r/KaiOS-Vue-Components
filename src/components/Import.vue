@@ -93,6 +93,10 @@ export default {
     // TODO DELTE ME! Only for test purposes
     // this.num = this.account.secret
 
+    store.keys.left = {
+      string: 'Back',
+      fn: () => this.$router.go(-1)
+    }
     this.$refs.importInput.focus()
     document.addEventListener('keydown', this.onKeyDown)
     store.keys.right.string = 'delete'

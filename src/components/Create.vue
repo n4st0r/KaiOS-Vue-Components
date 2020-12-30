@@ -1,6 +1,6 @@
 <template>
     <div style="height: 100%">
-      <input @click="onEnter()" id="createAccount" type="button" :value="'Create XRP Account'" ref="createBtn">
+      <input id="createAccount" type="button" :value="'Create XRP Account'" ref="createBtn">
       <div v-if="obj.account && !isActive" class="container">
         <label>{{ obj.account.address }}</label>
         <div class="row">
@@ -17,6 +17,7 @@
 <script>
 import { Account } from 'xrpl-secret-numbers'
 import VueQrcode from '@chenfengyuan/vue-qrcode'
+import store from '@/js/store'
 
 export default {
   name: 'Create',
@@ -36,16 +37,20 @@ export default {
       this.isActive = !this.isActive
       this.obj = account
       console.log(account)
-    },
-    onEnter () {
+    }
+  },
+  mounted () {
+    store.keys.left = {
+      string: 'Back',
+      fn: () => this.$router.go(-1)
+    }
+    store.keys.center.fn = () => {
       if (Object.keys(this.obj).length === 0) {
         this.createAccount()
       } else {
         this.$router.push({ name: 'Import', params: { account: this.obj } })
       }
     }
-  },
-  mounted () {
     if (this.$refs.createBtn !== undefined) this.$refs.createBtn.focus()
   }
 }

@@ -97,6 +97,10 @@ export default {
     }
   },
   mounted () {
+    store.keys.left = {
+      string: 'Back',
+      fn: () => this.$router.push('/')
+    }
     document.addEventListener('keydown', this.onKeyDown)
   },
   beforeDestroy () {
