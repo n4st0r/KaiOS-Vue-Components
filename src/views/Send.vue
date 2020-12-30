@@ -155,6 +155,19 @@ export default {
     this.DestinationTag = this.tag
     this.Account = this.address
     store.keys.center.fn = () => { return null }
+    store.keys.right = {
+      string: 'del',
+      fn: () => {
+        switch (this.focusIndex) {
+          case 3:
+            this.Amount = this.Amount.slice(0, -1)
+            break
+          case 4:
+            this.Memo = this.Memo.slice(0, -1)
+            break
+        }
+      }
+    }
   },
   mounted () {
     document.addEventListener('keydown', this.onKeyDown)
