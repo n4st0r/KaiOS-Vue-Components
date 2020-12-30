@@ -32,7 +32,10 @@ export default {
   },
   methods: {
     fail () {
-      if (this.count === this.pin.length) this.deleteAccount()
+      window.navigator.vibrate(200)
+      if (localStorage.tries) localStorage.tries++
+      else localStorage.tries = 1
+      if (localStorage.tries === this.pin.length) this.deleteAccount()
       this.$notify({ group: 'foo', title: 'Please try again!', type: 'error' })
       this.incorrect = true
       setTimeout(() => this.count++, 500)
@@ -78,6 +81,7 @@ export default {
         let seed
         try {
           seed = this.decrypt(socket.getSecretKey(), this.pin[this.count])
+          if (localStorage.tries) localStorage.removeItem('tries')
         } catch (e) {
           console.log('Error deriving public address')
           console.log(e)
@@ -104,9 +108,6 @@ export default {
         return this.$emit('success')
       }
       setTimeout(() => this.count++, 500)
-      // if setup
-      // if (failed)
-      // ifcount === 6 delete account else this.count ++
     },
     decrypt (input, secret) {
       console.log(`Input: ${input}, secret: ${secret}`)
@@ -131,6 +132,13 @@ export default {
     }
   },
   mounted () {
+    if (!this.setup) {
+      const tries = localStorage.tries
+      if (tries && tries >= 1) {
+        this.count = tries
+        this.incorrect = true
+      }
+    }
     document.addEventListener('keydown', this.onKeyDown)
   },
   beforeDestroy () {
@@ -160,8 +168,8 @@ export default {
     border: 2px solid grey;
     border-radius: 20px;
     margin: 10px;
-    height: 16px;
-    width: 16px;
+    height: 12px;
+    width: 12px;
     display: flex;
     align-items: center;
 }
