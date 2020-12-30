@@ -149,6 +149,7 @@ const renameKey = (object, key, newKey) => {
 }
 
 const addTx = (tx) => {
+  window.navigator.vibrate(200)
   console.log('Received a TX')
   console.log(tx)
   const account = store.account.Account
@@ -156,7 +157,7 @@ const addTx = (tx) => {
 
   tx = renameKey(tx, 'transaction', 'tx')
   store.tx.unshift(tx)
-  if (tx.Account !== account) {
+  if (tx.tx.Account === account) {
     if (typeof delivered === 'string') {
       Vue.notify({
         group: 'foo',
@@ -178,7 +179,7 @@ const addTx = (tx) => {
         group: 'foo',
         type: 'warn',
         title: 'Incoming Transaction',
-        text: `Received XRP ${delivered / 1000000} from a new transaction!`
+        text: `Received ${delivered / 1000000} XRP from a new transaction!`
       })
     } else {
       Vue.notify({
