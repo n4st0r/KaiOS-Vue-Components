@@ -88,15 +88,15 @@ export default {
         var newValue
         if (this.focusIndex === 0) {
           newValue = this.contactobj.name.slice(0, -1)
-          Vue.set(this.contactobj, 'name', newValue)
+          return Vue.set(this.contactobj, 'name', newValue)
         }
         if (this.focusIndex === 1) {
           newValue = this.contactobj.account.slice(0, -1)
-          Vue.set(this.contactobj, 'account', newValue)
+          return Vue.set(this.contactobj, 'account', newValue)
         }
         if (this.focusIndex === 2) {
-          newValue = this.contactobj.tag.slice(0, -1)
-          Vue.set(this.contactobj, 'tag', newValue)
+          newValue = this.contactobj.tag.toString().slice(0, -1)
+          Vue.set(this.contactobj, 'tag', parseInt(newValue))
         }
       }
     }
