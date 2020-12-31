@@ -1,17 +1,23 @@
 <template>
-    <div class="spinner">
+    <!-- <div class="spinner">
         <div class="bounce1"></div>
         <div class="bounce2"></div>
         <div class="bounce3"></div>
-    </div>
+    </div> -->
+  <!-- <img :src="`${publicPath}assets/xrp-loader.1a890ba6.png`"> -->
+    <img src="assets/xrp-loader.1a890ba6.png">
 </template>
 
 <script>
 export default {
   name: 'spinner',
+  data () {
+    return {
+      publicPath: process.env.BASE_URL
+    }
+  }
 }
 </script>
-
 
 <style scoped>
 .spinner {
@@ -39,10 +45,10 @@ export default {
   40% { -webkit-transform: scale(1.0) }
 }
 @keyframes sk-bouncedelay {
-  0%, 80%, 100% { 
+  0%, 80%, 100% {
     -webkit-transform: scale(0);
     transform: scale(0);
-  } 40% { 
+  } 40% {
     -webkit-transform: scale(1.0);
     transform: scale(1.0);
   }

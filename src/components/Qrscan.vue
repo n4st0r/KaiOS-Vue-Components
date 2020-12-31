@@ -1,35 +1,34 @@
 <template>
   <!-- <qrcode-stream @decode="onDecode"></qrcode-stream> -->
-  <VueQrcode :value="destination" :options="{ width: 115 }"></VueQrcode>
+  <div>
+    <QrcodeScanner
+      :qrbox="250"
+      :fps="10"
+      style="width: 500px;"
+      @result="onScan"
+    />
+  </div>
 </template>
 
 <script>
 // import { QrcodeStream } from 'vue-qrcode-reader'
-import VueQrcode from '@chenfengyuan/vue-qrcode'
-import socket from '@/js/socket.js'
+// import socket from '@/js/socket.js'
 import store from '@/js/store'
+import QrcodeScanner from '@/components/QrcodeScanner.vue'
 
 export default {
   name: 'qrscanner',
   components: {
     // QrcodeStream,
-    VueQrcode
+    QrcodeScanner
   },
   data () {
     return {
-      destination: 'rDbWJ9C7uExThZYAwV8m6LsZ5YSX3sa6US',
-      tag: null,
-      amount: 1
     }
   },
   methods: {
-    onDecode (decodedString) {
+    onScan (decodedString) {
       console.log(decodedString)
-    },
-    sendTransaction () {
-      const seed = 'sXXX'
-      const signedTX = socket.signPaymentTransaction(this.destination, this.tag, this.amount, seed)
-      console.log(signedTX)
     }
   },
   created () {

@@ -9,7 +9,7 @@
             </div>
         </div>
         <div class="container" v-else>
-          <img src="https://testnet.xrpl.org/static/media/xrp-loader.1a890ba6.png">
+          <Spinner />
         </div>
     </div>
 </template>
@@ -18,9 +18,11 @@
 import store from '@/js/store'
 import socket from '@/js/socket.js'
 import Vue from 'vue'
+import Spinner from './Spinner.vue'
 
 // props[account = account object, setup = bolean]
 export default {
+  components: { Spinner },
   name: 'setup',
   props: ['account', 'setup', 'transaction', 'sign'],
   data () {
