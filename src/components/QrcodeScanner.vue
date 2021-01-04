@@ -1,33 +1,52 @@
 <template>
-    <div id="qr-code-full-region"></div>
+  <div>
+    <section id="cam-container">
+      <video ref="cam-view"></video>
+      <canvas ref="cam-frame" hidden></canvas>
+    </section>
+  </div>
 </template>
 
-<script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
-
 <script>
+// import Html5QrcodeScanner from '@/js/html5-qrcode.min.js'
+// import QrScanner from 'qr-scanner'
+// import QrScannerWorkerPath from '!!file-loader!../../node_modules/qr-scanner/qr-scanner-worker.min.js'
+// QrScanner.WORKER_PATH = QrScannerWorkerPath
+
 export default {
-  props: {
-    qrbox: {
-      type: Number,
-      default: 250
-    },
-    fps: {
-      type: Number,
-      default: 10
-    },
-  },
-  mounted () {
-    const config = {
-      fps: this.fps,
-      qrbox: this.qrbox,
-    };
-    const html5QrcodeScanner = new Html5QrcodeScanner('qr-code-full-region', config);
-    html5QrcodeScanner.render(this.onScanSuccess);
-  },
   methods: {
     onScanSuccess (qrCodeMessage) {
-      this.$emit('result', qrCodeMessage);
+      this.$notify({ group: 'foo', title: 'Scanned a QR Code', text: qrCodeMessage, type: 'success' })
+      navigator.vibrate(200)
+      this.$emit('result', qrCodeMessage)
+    },
+    capture () {
+      const canvas = this.$refs['cam-frame']
+      const video = this.$refs['cam-view']
+      const canvasContext = canvas.getContext('2d')
+
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.height = video.videoHeight
+        canvas.width = video.videoWidth
+        canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height)
+        const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height)
+        const code = window.jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'dontInvert' })
+        if (code) {
+          this.onScanSuccess(code.data)
+        }
+      }
     }
+  },
+  mounted () {
+    const video = this.$refs['cam-view']
+
+    setInterval(this.capture, 200)
+
+    navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: 'environment' } }).then(stream => {
+      video.srcObject = stream
+      video.setAttribute('playsinline', true)
+      video.play()
+    })
   }
 }
 </script>

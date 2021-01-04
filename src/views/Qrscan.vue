@@ -1,34 +1,32 @@
 <template>
   <!-- <qrcode-stream @decode="onDecode"></qrcode-stream> -->
-  <div>
+  <div class="container">
     <QrcodeScanner
       :qrbox="250"
       :fps="10"
-      style="width: 500px;"
       @result="onScan"
     />
+    {{ string }}
   </div>
 </template>
 
 <script>
-// import { QrcodeStream } from 'vue-qrcode-reader'
-// import socket from '@/js/socket.js'
 import store from '@/js/store'
 import QrcodeScanner from '@/components/QrcodeScanner.vue'
 
 export default {
   name: 'qrscanner',
   components: {
-    // QrcodeStream,
     QrcodeScanner
   },
   data () {
     return {
+      string: 'null'
     }
   },
   methods: {
     onScan (decodedString) {
-      console.log(decodedString)
+      this.string = decodedString
     }
   },
   created () {
@@ -39,3 +37,11 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+</style>

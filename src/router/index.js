@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 import Menu from '../views/Menu.vue'
-import QR from '../components/Qrscan.vue'
+import QR from '../views/Qrscan.vue'
 import Create from '../components/Create.vue'
 import Import from '../components/Import.vue'
 import Wallet from '../views/Wallet.vue'
