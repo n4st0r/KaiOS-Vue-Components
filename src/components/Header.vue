@@ -1,6 +1,6 @@
 <template>
   <header class="header">
-    <span>{{ title }}</span>
+    <h1>{{ title }}</h1>
   </header>
 </template>
 
@@ -17,19 +17,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .header {
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    background-color: #0029FF;
-    padding: 3px 10px;
-  }
+.header {
+  height: 2.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  background-color: #0029FF;
+  padding: 3px 1rem;
+}
 
-  .header span {
-    font-size: 16px;
-    font-weight: 600;
-    color: #ffffff;
-    /* text-transform: uppercase; */
-  }
+h1 {
+  font-size: 17px;
+  font-weight: 400;
+  color: #ffffff;
+  width: 100%;
+  text-align: center;
+  /* text-transform: uppercase; */
+}
 </style>

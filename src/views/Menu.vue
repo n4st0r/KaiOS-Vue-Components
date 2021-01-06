@@ -16,7 +16,7 @@ export default {
   data () {
     return {
       height: 666,
-      items: ['Wallet', 'Generate', 'Import', 'Contacts'],
+      items: ['Home', 'Wallet', 'Generate', 'Import', 'Contacts'],
       focusIndex: 0,
       activeElement: 'ListItem'
     }

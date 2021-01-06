@@ -22,6 +22,7 @@
 <script>
 import store from '@/js/store'
 import Vue from 'vue'
+import { Encode } from 'xrpl-tagged-address-codec'
 
 export default {
   props: ['contact', 'add'],
@@ -40,8 +41,17 @@ export default {
       this.$notify({ group: 'foo', title: 'TODO Delete contact in DataStore', type: 'warn' })
     },
     setContact () {
-      this.$notify({ group: 'foo', title: 'TODO save contact in DataStore', type: 'warn' })
-      console.log(this.contactobj)
+      try {
+        Encode({
+          account: this.contactobj.account,
+          tag: this.contactobj.tag,
+          test: false
+        })
+        this.$notify({ group: 'foo', title: 'TODO: Save user in datastore', type: 'success' })
+        console.log(this.contactobj)
+      } catch (e) {
+        this.$notify({ group: 'foo', title: 'This is not an XRP Account', type: 'error' })
+      }
     },
     onKeyDown (event) {
       switch (event.key) {

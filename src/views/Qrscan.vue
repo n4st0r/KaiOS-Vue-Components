@@ -13,6 +13,7 @@
 <script>
 import store from '@/js/store'
 import QrcodeScanner from '@/components/QrcodeScanner.vue'
+import StringTypeDetector from 'xumm-string-decode'
 
 export default {
   name: 'qrscanner',
@@ -25,8 +26,10 @@ export default {
     }
   },
   methods: {
-    onScan (decodedString) {
-      this.string = decodedString
+    onScan (string) {
+      const someString = 'https://ripple.com//send?to=rPdvC6ccq8hCdPKSPJkPmyZ4Mi1oG2FFkT&amount=30&dt=123'
+      const detected = new StringTypeDetector(someString)
+      this.string = detected
     }
   },
   created () {

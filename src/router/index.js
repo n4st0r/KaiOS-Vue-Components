@@ -10,9 +10,16 @@ import tx from '../views/tx.vue'
 import Setup from '../components/Setup.vue'
 import Contacts from '../views/Contacts.vue'
 
+import Tabs from '../views/Tabs.vue'
+
 Vue.use(VueRouter)
 
 const routes = [
+  {
+    path: '/Home',
+    name: 'Home',
+    component: Tabs
+  },
   {
     path: '/',
     name: 'Menu',

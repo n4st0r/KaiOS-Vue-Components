@@ -1,9 +1,9 @@
 <template>
   <div id="app">
-    <Header title="XUMM" style="height: 35px"/>
-    <Setup @success="session = true" v-if="!session" style="height: calc(100% - (35px + 30px))"/>
-    <router-view v-if="session" style="height: calc(100% - (35px + 30px))"/>
-    <Softkey style="height: 30px"/>
+    <Header title="XUMM" style="height: 2.8rem"/>
+    <Setup @success="session = true" v-if="!session" style="height: calc(100% - (2.8rem + 3rem))"/>
+    <router-view v-if="session" style="height: calc(100% - (2.8rem + 3rem))"/>
+    <Softkey style="height: 3rem"/>
     <notifications group="foo" width="80%" position="bottom center" :max="1"/>
   </div>
 </template>

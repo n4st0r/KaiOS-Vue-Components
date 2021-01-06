@@ -1,8 +1,8 @@
 <template>
   <div class="softkey">
-    <label class="left">{{ key.left.string }}</label>
-    <label class="center">{{ key.center.string }}</label>
-    <label class="right">{{ key.right.string }}</label>
+    <h5 class="left">{{ key.left.string }}</h5>
+    <h5 class="center">{{ key.center.string }}</h5>
+    <h5 class="right">{{ key.right.string }}</h5>
     <!-- v-on:SoftRight="back()" -->
   </div>
 </template>
@@ -20,8 +20,8 @@ export default {
   methods: {
     onKeyDown (event) {
       switch (event.key) {
-        // case 'ArrowLeft':
-        case 'SoftLeft':
+        case 'ArrowLeft':
+        // case 'SoftLeft':
           this.key.left.fn()
           break
         case 'Enter':
@@ -44,54 +44,44 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .softkey {
-    height: 100%;
-    width: 100%;
-    max-width: 100%;
-    background: white;
-    border-top: 2px #cbcbcb solid;
-    display: flex;
-    flex-shrink: 0;
-    white-space: nowrap;
-    padding: 0 5px;
-    font-weight: 700;
-    box-sizing: border-box;
-    line-height: 26px;
-    margin-top: auto;
-    // position: absolute;
-    // bottom: 0;
-  }
-
-  .left,
-  .right {
-    font-weight: 600;
-    font-size: 14px;
-    color: #242424;
-    overflow: hidden;
-    width: 100%;
-    letter-spacing: -0.5px;
-    box-sizing: border-box;
-    text-overflow: ellipsis;
-  }
-
-  .left {
-    text-align: left;
-    padding-right: 5px;
-  }
-
-  .center {
-    color: #242424;
-    /* text-transform: uppercase; */
-    font-size: 18px;
-    text-align: center;
-    max-width: 150px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 200%;
-  }
-
-  .right {
-    text-align: right;
-    padding-left: 5px;
-  }
+h5 {
+  color: black;
+  font-size: 14px;
+  font-weight: 400;
+  margin: auto 0 auto 0;
+}
+.softkey {
+  height: 100%;
+  width: 100%;
+  max-width: 100%;
+  background: white;
+  border-top: 2px #cbcbcb solid;
+  display: flex;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.left,
+.right {
+  // overflow: hidden;
+  width: 7.2rem;
+  // box-sizing: border-box;
+  text-overflow: ellipsis;
+}
+.left {
+  text-align: left;
+  margin-left: 0.5rem !important;
+}
+.center {
+  text-align: center;
+  text-transform: uppercase;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 7.6rem;
+  margin: auto 0.5rem;
+  font-weight: 600;
+}
+.right {
+  text-align: right;
+  margin-right: 0.5rem !important;
+}
 </style>

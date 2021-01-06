@@ -6,33 +6,47 @@
         <label v-if="account.error === 'actNotFound'">{{ account.account }}</label>
       </div>
       <hr>
+      <div v-if="transactions[0]" id="transaction-list" ref="txList">
+        <div v-for="(tx, index) in transactions" :key="index" id="transaction-items">
+          <div :class="{ focus: index === focusIndex}" :tabindex="index" @click="info(tx)" class="transaction-item"  ref="items">
+            <img src="https://www.flaticon.com/premium-icon/icons/svg/2936/2936758.svg">
+            <div id="transaction-text">
+              <label class="transaction-account" v-if="tx.tx.Account === account.Account">{{ getAccountName(tx.tx.Destination) }}</label>
+              <label class="transaction-account" v-if="tx.tx.Account !== account.Account">{{ getAccountName(tx.tx.Account) }}</label>
+              <label>{{ tx.tx.TransactionType }}</label>
+            </div>
+            <div class="transaction-amount">
+              <label class="withdrawl" v-if="tx.tx.Account === account.Account">- {{ dropstoXRP(tx.tx.Amount) }}</label>
+              <label class="received" v-if="tx.tx.Account !== account.Account">+ {{ dropstoXRP(tx.meta.delivered_amount) }}</label>
+              <label class="currency" v-if="typeof tx.meta.delivered_amount === 'object'" >{{ tx.meta.delivered_amount.currency }}</label>
+              <label class="currency" v-if="typeof tx.meta.delivered_amount === 'string'">XRP</label>
+            </div>
+          </div>
+        </div>
+      </div>
       <div v-if="account.error === 'actNotFound'">
         <p>This is an unactivated account, please send at least 20 XRP to this account to activate it!</p>
-      </div>
-      <VueQrcode v-if="account.Account" :value="account.Account" :options="{ width: 115 }"></VueQrcode>
-      <div>
-        IOUS
       </div>
     </div>
 </template>
 
 <script>
-import VueQrcode from '@chenfengyuan/vue-qrcode'
 import store from '@/js/store.js'
 
 export default {
   name: 'Wallet',
-  components: {
-    VueQrcode
-  },
   data () {
     return {
+      marker: undefined,
       focusIndex: 0
     }
   },
   computed: {
     account () {
       return store.account
+    },
+    transactions () {
+      return store.tx
     }
   },
   methods: {
@@ -44,6 +58,9 @@ export default {
     dropstoXRP (drops) {
       const xrp = drops / 1000000
       return xrp
+    },
+    info (tx) {
+      this.$router.push({ name: 'transaction', params: { tx: tx } })
     },
     onKeyDown (event) {
       switch (event.key) {
