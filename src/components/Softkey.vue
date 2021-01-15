@@ -20,8 +20,8 @@ export default {
   methods: {
     onKeyDown (event) {
       switch (event.key) {
-        case 'ArrowLeft':
-        // case 'SoftLeft':
+        // case 'ArrowLeft':
+        case 'SoftLeft':
           this.key.left.fn()
           break
         case 'Enter':
@@ -54,8 +54,7 @@ h5 {
   height: 100%;
   width: 100%;
   max-width: 100%;
-  background: white;
-  border-top: 2px #cbcbcb solid;
+  background: #cbcbcb;
   display: flex;
   flex-shrink: 0;
   white-space: nowrap;

@@ -3,7 +3,7 @@
         <label id="transaction-type">{{ tx.tx.TransactionType }}</label>
         <label id="transaction-result" v-bind:class="{ success: tx.meta.TransactionResult === 'tesSUCCESS' }" >{{ result(tx.meta.TransactionResult) }}</label>
         <label id="transaction-time">{{ transactionDate }}</label>
-        <div id="transaction-amount">
+        <div v-if="tx.tx.Amount || tx.meta.delivered_amount" id="transaction-amount">
             <label class="withdrawl" v-if="tx.tx.Account === account.Account">- {{ dropstoXRP(tx.tx.Amount) }}</label>
             <label class="received" v-if="tx.tx.Account !== account.Account">+ {{ dropstoXRP(tx.meta.delivered_amount) }}</label>
             <label class="currency" v-if="typeof tx.meta.delivered_amount === 'object'" >{{ tx.meta.delivered_amount.currency }}</label>
@@ -18,7 +18,6 @@
         <hr>
 
         <div id="transfer">
-
           <label class="header">From</label>
           <div class="account">
             <img src="https://www.flaticon.com/svg/static/icons/svg/214/214362.svg" width="25px" max-height="25px">
@@ -29,8 +28,9 @@
           </div>
 
           <img class="arrow" src="https://www.flaticon.com/svg/static/icons/svg/2223/2223613.svg">
+
           <label class="header">To</label>
-          <div class="account">
+          <div v-if="tx.tx.TransactionType === 'Payment'" class="account">
             <img src="https://www.flaticon.com/svg/static/icons/svg/214/214362.svg" width="25px" max-height="25px">
             <div class="column">
               <label class="bold">{{ getAccountName(tx.tx.Destination) }}</label>

@@ -14,14 +14,14 @@ const init = () => {
     subscribe(account)
     setAccountInfo(account)
     setAccountTx(account)
+    setAccountLines(account)
   }
 }
 
 const connect = () => {
-  // if (server !== undefined && state() === 1) return server
   if (server !== undefined && server.getState().online) return server
   return new Promise((resolve, reject) => {
-    new RippledWsClient(url).then(connection => {
+    new RippledWsClient(url, { NoUserAgent: true }).then(connection => {
       server = connection
       console.log('ws opened!')
       Vue.notify({
@@ -87,12 +87,27 @@ const setAccountTx = async (account) => {
 }
 
 const setAccountInfo = async (account) => {
+  account = 'rDXJt3qZ62HtfTv728Vbuoq9BdAihYJZZd'
   const msg = await command({
     command: 'account_info',
-    account: account
+    strict: true,
+    ledger_index: 'current',
+    account: account,
+    queue: true
   })
+  console.log(msg)
   if (msg.account_data) store.account = msg.account_data
   else store.account = msg
+}
+
+const setAccountLines = async (account) => {
+  const msg = await command({
+    command: 'account_lines',
+    account: account,
+    ledger_index: 'validated'
+  })
+  console.log(msg)
+  Vue.set(store.account, 'lines', msg.lines)
 }
 
 const getPublicAddress = () => {
@@ -119,7 +134,6 @@ const getSecretKey = () => {
 
 const signTransaction = (transaction, seed) => {
   console.log(transaction)
-  console.log(seed)
   return new Promise((resolve, reject) => {
     new RippledWsClientSign(transaction, seed, server).then(signedTX => {
       resolve(signedTX)

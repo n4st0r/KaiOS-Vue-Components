@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import Vue from 'vue'
 import router from '../router'
 
@@ -29,30 +31,77 @@ const store = Vue.observable({
       name: 'Antonio',
       tag: 123456
     }
-  }
-  // contacts: [
-  //   {
-  //     id: 'id',
-  //     name: 'Santa',
-  //     accounts: [
-  //       { account: 'rh5juM8LsHPw5doRJopaihzqn2pJnRVBNr', tag: 89416 }
-  //     ]
-  //   },
-  //   {
-  //     id: 'id1',
-  //     name: 'Rudolph',
-  //     accounts: [
-  //       { account: 'rh5juM8LsHPw5doRJopaihzqn2pJnRVBNr', tag: 89416 }
-  //     ]
-  //   },
-  //   {
-  //     id: 'id2',
-  //     name: 'Antonio',
-  //     accounts: [
-  //       { account: 'rh5juM8LsHPw5doRJopaihzqn2pJnRVBNr' }
-  //     ]
-  //   }
-  // ]
+  },
+  curated_assets: {
+    'issuers': [
+      'Bitstamp',
+      'GateHub'
+    ],
+    'currencies': [
+      'USD',
+      'EUR',
+      'BTC',
+      'ETH'
+    ],
+    'details': {
+      'Bitstamp': {
+        'id': 185,
+        'name': 'Bitstamp',
+        'domain': 'bitstamp.net',
+        'avatar': 'https://nd4d3do.dlvr.cloud/ex-bitstamp.png',
+        'currencies': {
+          'USD': {
+            'id': 178,
+            'issuer_id': 185,
+            'issuer': 'rvYAfWj5gh67oV6fW32ZzP3Aw4Eubs59B',
+            'currency': 'USD',
+            'name': 'US Dollar',
+            'avatar': 'https://nd4d3do.dlvr.cloud/fiat-dollar.png'
+          }
+        }
+      },
+      'GateHub': {
+        'id': 182,
+        'name': 'GateHub',
+        'domain': 'gatehub.net',
+        'avatar': 'https://nd4d3do.dlvr.cloud/ex-gatehub.png',
+        'currencies': {
+          'EUR': {
+            'id': 169,
+            'issuer_id': 182,
+            'issuer': 'rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq',
+            'currency': 'EUR',
+            'name': 'Euro',
+            'avatar': 'https://nd4d3do.dlvr.cloud/fiat-euro.png'
+          },
+          'USD': {
+            'id': 170,
+            'issuer_id': 182,
+            'issuer': 'rhub8VRN55s94qWKDv6jmDy1pUykJzF3wq',
+            'currency': 'USD',
+            'name': 'US Dollar',
+            'avatar': 'https://nd4d3do.dlvr.cloud/fiat-dollar.png'
+          },
+          'BTC': {
+            'id': 172,
+            'issuer_id': 182,
+            'issuer': 'rchGBxcD1A1C2tdxF6papQYZ8kjRKMYcL',
+            'currency': 'BTC',
+            'name': 'Bitcoin',
+            'avatar': 'https://nd4d3do.dlvr.cloud/crypto-btc.png'
+          },
+          'ETH': {
+            'id': 174,
+            'issuer_id': 182,
+            'issuer': 'rcA8X3TVMST1n3CJeAdGk1RdRCHii7N2h',
+            'currency': 'ETH',
+            'name': 'Ethereum',
+            'avatar': 'https://nd4d3do.dlvr.cloud/crypto-eth.png'
+          }
+        }
+      }
+    }
+  } 
 })
 
 export default store

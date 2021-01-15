@@ -7,7 +7,8 @@
       </div>
       <hr>
       <div v-if="transactions[0]" id="transaction-list" ref="txList">
-        <div v-for="(tx, index) in transactions" :key="index" id="transaction-items">
+        <ListView :items="items"/>
+        <!-- <div v-for="(tx, index) in transactions" :key="index" id="transaction-items">
           <div :class="{ focus: index === focusIndex}" :tabindex="index" @click="info(tx)" class="transaction-item"  ref="items">
             <img src="https://www.flaticon.com/premium-icon/icons/svg/2936/2936758.svg">
             <div id="transaction-text">
@@ -15,14 +16,14 @@
               <label class="transaction-account" v-if="tx.tx.Account !== account.Account">{{ getAccountName(tx.tx.Account) }}</label>
               <label>{{ tx.tx.TransactionType }}</label>
             </div>
-            <div class="transaction-amount">
+            <div class="transaction-amount" v-if="tx.tx.Amount || tx.meta.delivered_amount">
               <label class="withdrawl" v-if="tx.tx.Account === account.Account">- {{ dropstoXRP(tx.tx.Amount) }}</label>
               <label class="received" v-if="tx.tx.Account !== account.Account">+ {{ dropstoXRP(tx.meta.delivered_amount) }}</label>
               <label class="currency" v-if="typeof tx.meta.delivered_amount === 'object'" >{{ tx.meta.delivered_amount.currency }}</label>
               <label class="currency" v-if="typeof tx.meta.delivered_amount === 'string'">XRP</label>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
       <div v-if="account.error === 'actNotFound'">
         <p>This is an unactivated account, please send at least 20 XRP to this account to activate it!</p>
@@ -32,12 +33,13 @@
 
 <script>
 import store from '@/js/store.js'
+import ListView from '@/components/ListView.vue'
 
 export default {
+  components: { ListView },
   name: 'Wallet',
   data () {
     return {
-      marker: undefined,
       focusIndex: 0
     }
   },
@@ -47,6 +49,23 @@ export default {
     },
     transactions () {
       return store.tx
+    },
+    items () {
+      const array = []
+      store.tx.forEach(tx => {
+        const withdrawl = tx.tx.Account === this.account.Account
+        array.push({
+          img: 'https://www.flaticon.com/premium-icon/icons/svg/2936/2936758.svg',
+          labels: [
+            withdrawl ? this.getAccountName(tx.tx.Destination) : this.getAccountName(tx.tx.Account),
+            tx.tx.TransactionType
+          ],
+          amount: {
+            value: withdrawl ? '-' + this.dropstoXRP(tx.tx.Amount) : '+' + this.dropstoXRP(tx.meta.delivered_amount)
+          }
+        })
+      })
+      return array
     }
   },
   methods: {
@@ -61,39 +80,6 @@ export default {
     },
     info (tx) {
       this.$router.push({ name: 'transaction', params: { tx: tx } })
-    },
-    onKeyDown (event) {
-      switch (event.key) {
-        case 'ArrowDown':
-          this.focusIndex++
-          this.$refs.txList.scrollBy({
-            top: this.$refs.items[0].offsetHeight,
-            left: 0
-          })
-          break
-        case 'ArrowUp':
-          this.focusIndex--
-          this.$refs.txList.scrollBy({
-            top: -this.$refs.items[0].offsetHeight,
-            left: 0
-          })
-          break
-        case 'Enter':
-          this.info(this.transactions[this.focusIndex])
-          break
-        default:
-          console.log(event.code)
-      }
-      this.focusInput(this.transactions.length)
-    },
-    focusInput (length) {
-      if (this.focusIndex >= length) {
-        this.focusIndex = 0
-        this.$refs.txList.scrollTop = 0
-      } else if (this.focusIndex < 0) {
-        this.focusIndex = (length - 1)
-        this.$refs.txList.scrollTop = this.$refs.txList.scrollHeight
-      }
     }
   },
   mounted () {
@@ -105,10 +91,6 @@ export default {
       string: 'QR',
       fn: () => this.$router.push({ name: 'QRview', params: { string: this.account.Account } })
     }
-    document.addEventListener('keydown', this.onKeyDown)
-  },
-  beforeDestroy () {
-    document.removeEventListener('keydown', this.onKeyDown)
   }
 }
 </script>
@@ -117,6 +99,7 @@ export default {
 #transaction-container {
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 #top {
   display: flex;

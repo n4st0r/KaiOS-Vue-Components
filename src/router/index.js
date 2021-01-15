@@ -80,15 +80,17 @@ const routes = [
     name: 'Send',
     component: () => import(/* webpackChuckName: "Send" */ '../views/Send.vue'),
     props: true
+  },
+  {
+    path: '/Trustlines',
+    name: 'Trustlines',
+    component: () => import(/* webpackChunkName: "Trustlines" */ '../views/Trustlines.vue')
+  },
+  {
+    path: '/TrustSet',
+    name: 'TrustSet',
+    component: () => import(/* */ '../views/TrustSet.vue')
   }
-  // {
-  //   path: '/about',
-  //   name: 'About',
-  //   // route level code-splitting
-  //   // this generates a separate chunk (about.[hash].js) for this route
-  //   // which is lazy-loaded when the route is visited.
-  //   component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  // }
 ]
 
 const router = new VueRouter({

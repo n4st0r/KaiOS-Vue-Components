@@ -2,7 +2,7 @@
     <div class="container">
         <label>Contacts</label>
         <div v-if="contacts" id="contacts-list" ref="contactList">
-            <div v-for="(contact, key, index) in contacts" :key="index" id="contact-items">
+            <!-- <div v-for="(contact, key, index) in contacts" :key="index" id="contact-items">
                 <div :class="{ focus: index === focusIndex }" :tabindex="index" @click="info(contact)" class="contact-item"  ref="items">
                 <img src="https://www.flaticon.com/svg/static/icons/svg/1077/1077012.svg">
                 <div class="contact-text">
@@ -12,15 +12,18 @@
                         <label class="withdrawl">{{ key }}</label>
                     </div>
                 </div>
-            </div>
+            </div> -->
+            <ListView :items="items"/>
         </div>
     </div>
 </template>
 
 <script>
 import store from '@/js/store.js'
+import ListView from '../components/ListView.vue'
 
 export default {
+  components: { ListView },
   name: 'contacts',
   data () {
     return {
@@ -30,6 +33,20 @@ export default {
   computed: {
     contacts () {
       return store.contacts
+    },
+    items () {
+      const array = []
+      for (const account in store.contacts) {
+        const contact = store.contacts[account]
+        array.push({
+          img: 'https://www.flaticon.com/svg/static/icons/svg/1077/1077012.svg',
+          labels: [
+            contact.name,
+            account
+          ]
+        })
+      }
+      return array
     }
   },
   methods: {

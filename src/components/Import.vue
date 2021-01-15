@@ -87,6 +87,10 @@ export default {
         case 'Enter':
           this.next()
           break
+        default:
+          this.$notify({ group: 'foo', title: event.code })
+          console.log(event)
+          break
       }
     }
   },

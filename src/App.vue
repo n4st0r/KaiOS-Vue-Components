@@ -14,7 +14,6 @@ import Softkey from '@/components/Softkey.vue'
 import Setup from '@/components/Setup.vue'
 
 import socket from '@/js/socket.js'
-// import socket from '@/js/socket-1.js'
 // import store from '@/js/store.js'
 
 export default {
@@ -76,6 +75,7 @@ export default {
     overflow: hidden;
     background-color: #E1E2E1 !important;
     height: 100%;
+    font-size: 10px;
   }
   #app {
     height: 100%
