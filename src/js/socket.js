@@ -1,13 +1,16 @@
 import Vue from 'vue'
 import RippledWsClient from 'rippled-ws-client'
-import RippledWsClientSign from 'rippled-ws-client-sign'
+// import RippledWsClientSign from 'rippled-ws-client-sign'
+// // import RippleKeypairs from 'ripple-keypairs'
 import store from './store.js'
-// const url = 'wss://s.devnet.rippletest.net:51233'
+// // const url = 'wss://s.devnet.rippletest.net:51233'
 const url = 'wss://testnet.xrpl-labs.com'
-// const url = 'wss://xrpl.ws'
+// // const url = 'wss://xrpl.ws'
 let server
 
 const init = () => {
+  // console.log(navigator)
+  // console.log(navigator.getDeviceStorage())
   const address = getPublicAddress()
   if (address !== null && address !== undefined) {
     const account = address
@@ -86,6 +89,15 @@ const setAccountTx = async (account) => {
   store.tx = msg.transactions
 }
 
+// const setAccounts = () => {
+//   const data = ['', '']
+//   data.forEach(secret => {
+//     const keys = RippleKeypairs.deriveKeypair(secret)
+//     if (keys.privateKey) store.accounts.push()
+//   })
+//   store.accounts.push()
+// }
+
 const setAccountInfo = async (account) => {
   account = 'rDXJt3qZ62HtfTv728Vbuoq9BdAihYJZZd'
   const msg = await command({
@@ -123,6 +135,27 @@ const getAccountBalance = () => {
   return store.account.Balance
 }
 
+const getAccountName = (account) => {
+  if (store.account.Account === account) return 'My Wallet'
+  else {
+    const contact = store.contacts[account]
+    if (contact) return contact.name
+    else return null
+  }
+}
+
+const getIssuerName = (account) => {
+  for (const issuerName in store.curated_assets.details) {
+    try {
+      const currencies = store.curated_assets.details[issuerName].currencies
+      for (const currency in currencies) {
+        if (account === currencies[currency].issuer) return store.curated_assets.details[issuerName].name
+      }
+    } catch (e) {}
+  }
+  return 'Issuer'
+}
+
 const getSecretKey = () => {
   const secret = localStorage.secret
   if (secret !== undefined) {
@@ -135,12 +168,13 @@ const getSecretKey = () => {
 const signTransaction = (transaction, seed) => {
   console.log(transaction)
   return new Promise((resolve, reject) => {
-    new RippledWsClientSign(transaction, seed, server).then(signedTX => {
-      resolve(signedTX)
-    }).catch(error => {
-      console.log(error)
-      reject(error)
-    })
+    resolve()
+    // new RippledWsClientSign(transaction, seed, server).then(signedTX => {
+    //   resolve(signedTX)
+    // }).catch(error => {
+    //   console.log(error)
+    //   reject(error)
+    // })
   })
 }
 
@@ -206,39 +240,6 @@ const addTx = (tx) => {
   }
 }
 
-// const parseMsg = (msg) => {
-//   const obj = msg
-//   // const obj = JSON.parse(msg.data)
-//   console.log(obj)
-
-//   if (obj.status === 'success') {
-//     const result = obj.result
-//     if (typeof result.account_data !== 'undefined') {
-//       const account = result.account_data
-//       // TODO
-//       // this.setAmount(acc.Account, acc.Balance)
-//       setAccount(account)
-//     } else if (typeof result.transactions !== 'undefined') {
-//       const tx = result.transactions
-//       // const address = res.account
-//       setTx(tx)
-//     }
-//   } else if (obj.status === 'closed' && obj.type === 'transaction') {
-//     const tx = obj.transaction
-//     const meta = obj.meta
-//     if (typeof tx !== 'undefined' && typeof meta !== 'undefined') {
-//       const transaction = {
-//         meta: meta,
-//         tx: tx,
-//         validated: false
-//       }
-//       addTx(transaction)
-//     }
-//   } else if (obj.status === 'error' && obj.error === 'actNotFound' && obj.request.command === 'account_info') {
-//     setAccount(obj)
-//   }
-// }
-
 export default {
   connect,
   init,
@@ -251,5 +252,7 @@ export default {
   clear,
   getSecretKey,
   signTransaction,
-  getAccountBalance
+  getAccountBalance,
+  getAccountName,
+  getIssuerName
 }

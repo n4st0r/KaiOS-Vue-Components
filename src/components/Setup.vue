@@ -20,6 +20,8 @@ import socket from '@/js/socket.js'
 import Vue from 'vue'
 import Spinner from './Spinner.vue'
 
+import dataStore from '@/js/dataStore.worker.js'
+
 // props[account = account object, setup = bolean]
 export default {
   components: { Spinner },
@@ -36,9 +38,8 @@ export default {
   methods: {
     fail () {
       window.navigator.vibrate(200)
-      if (localStorage.tries) localStorage.tries++
-      else localStorage.tries = 1
-      if (localStorage.tries === this.pin.length) this.deleteAccount()
+      dataStore.wrongPin()
+      if (dataStore.getPinTries() === this.pin.length) this.deleteAccount()
       this.$notify({ group: 'foo', title: 'Please try again!', type: 'error' })
       this.incorrect = true
       setTimeout(() => this.count++, 500)
@@ -64,8 +65,7 @@ export default {
             const address = this.account.account.address
             const secret = this.encrypt(this.account.account.familySeed, this.pin[0])
             socket.clear()
-            localStorage.public = address
-            localStorage.secret = secret
+            dataStore.setAccount(secret, address)
             this.$notify({ group: 'foo', title: 'Created an Account!', type: 'success' })
             socket.init()
             setTimeout(() => this.$router.push('/'), 2000)
@@ -84,7 +84,7 @@ export default {
         let seed
         try {
           seed = this.decrypt(socket.getSecretKey(), this.pin[this.count])
-          if (localStorage.tries) localStorage.removeItem('tries')
+          if (dataStore.getPinTries()) dataStore.resetPinCount()
         } catch (e) {
           console.log('Error deriving public address')
           console.log(e)
@@ -129,8 +129,7 @@ export default {
       return output
     },
     deleteAccount () {
-      localStorage.removeItem('public')
-      localStorage.removeItem('secret')
+      dataStore.clearAllData()
       socket.clear()
     }
   },

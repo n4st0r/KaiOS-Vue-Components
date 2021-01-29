@@ -13,7 +13,7 @@
             <div tabindex="-1" class="transaction-item" ref="input1">
                 <label>To</label>
                 <div class="account">
-                    <label class="name">No name</label>
+                    <label class="name">{{ destinationName }}</label>
                     <label>{{ Destination }}</label>
                     <div v-if="tag" id="tag">
                         <label>Tag: </label>
@@ -72,6 +72,9 @@ export default {
     address () {
       const address = socket.getPublicAddress()
       return address
+    },
+    destinationName () {
+      return socket.getAccountName(this.Destination)
     },
     balance () {
       return socket.getAccountBalance()

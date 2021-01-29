@@ -30,11 +30,11 @@
           <img class="arrow" src="https://www.flaticon.com/svg/static/icons/svg/2223/2223613.svg">
 
           <label class="header">To</label>
-          <div v-if="tx.tx.TransactionType === 'Payment'" class="account">
+          <div class="account">
             <img src="https://www.flaticon.com/svg/static/icons/svg/214/214362.svg" width="25px" max-height="25px">
             <div class="column">
-              <label class="bold">{{ getAccountName(tx.tx.Destination) }}</label>
-              <label>{{ tx.tx.Destination }}</label>
+              <label class="bold">{{ accountName }}</label>
+              <label>{{ address }}</label>
               <label>{{ tx.tx.DestinationTag }}</label>
             </div>
           </div>
@@ -53,11 +53,31 @@
 
 <script>
 import store from '@/js/store.js'
+import socket from '@/js/socket.js'
 
 export default {
   name: 'transaction',
   props: ['tx'],
   computed: {
+    accountName () {
+      switch (this.tx.tx.TransactionType) {
+        case 'Payment':
+          return socket.getAccountName(this.tx.tx.Destination)
+        case 'TrustSet':
+          return socket.getIssuerName(this.tx.tx.LimitAmount.issuer)
+      }
+      return 'No Name'
+    },
+    address () {
+      switch (this.tx.tx.TransactionType) {
+        case 'Payment':
+          return this.tx.tx.Destination
+        case 'TrustSet':
+          return this.tx.tx.LimitAmount.issuer
+        default:
+          return 'Undefined'
+      }
+    },
     account () {
       return store.account
     },
@@ -116,7 +136,7 @@ export default {
     }
   },
   created () {
-    if (!this.tx) this.$router.push({ name: 'Wallet' })
+    if (!this.tx) this.$router.go(-1)
     store.keys.left = {
       string: 'Back',
       fn: () => this.$router.go(-1)

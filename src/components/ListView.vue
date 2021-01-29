@@ -16,7 +16,6 @@
 </template>
 
 <script>
-/* eslint-disable */
 // items: [
 //     {
 //         img: 'https://www.flaticon.com/premium-icon/icons/svg/2936/2936758.svg',
@@ -35,7 +34,7 @@ export default {
     return {
       focusIndex: 0
     }
-    },
+  },
   methods: {
     onKeyDown (event) {
       switch (event.key) {
@@ -54,10 +53,10 @@ export default {
           })
           break
         case 'Enter':
-            this.$emit('enter', this.focusIndex)
+          this.$emit('enter', this.focusIndex)
           break
         default:
-          console.log(event.code)
+          // console.log(event.code)
       }
       this.focusInput(this.items.length)
     },
@@ -67,16 +66,16 @@ export default {
         this.$refs.list.scrollTop = 0
       } else if (this.focusIndex < 0) {
         this.focusIndex = (length - 1)
-        this.$refs.list.scrollTop = this.$refs.txList.scrollHeight
+        this.$refs.list.scrollTop = this.$refs.list.scrollHeight
       }
     }
-    },
-    mounted () {
-        document.addEventListener('keydown', this.onKeyDown)
-    },
-    beforeDestroy () {
-        document.removeEventListener('keydown', this.onKeyDown)
-    }
+  },
+  mounted () {
+    document.addEventListener('keydown', this.onKeyDown)
+  },
+  beforeDestroy () {
+    document.removeEventListener('keydown', this.onKeyDown)
+  }
 }
 </script>
 

@@ -2,18 +2,7 @@
     <div class="container">
         <label>Contacts</label>
         <div v-if="contacts" id="contacts-list" ref="contactList">
-            <!-- <div v-for="(contact, key, index) in contacts" :key="index" id="contact-items">
-                <div :class="{ focus: index === focusIndex }" :tabindex="index" @click="info(contact)" class="contact-item"  ref="items">
-                <img src="https://www.flaticon.com/svg/static/icons/svg/1077/1077012.svg">
-                <div class="contact-text">
-                    <label class="contact-account">{{ contact.name }}</label>
-                </div>
-                <div class="contact-amount">
-                        <label class="withdrawl">{{ key }}</label>
-                    </div>
-                </div>
-            </div> -->
-            <ListView :items="items"/>
+            <ListView @enter="info" :items="items"/>
         </div>
     </div>
 </template>
@@ -50,51 +39,14 @@ export default {
     }
   },
   methods: {
-    info (contact) {
-      this.$router.push({ name: 'Contact', params: { contact: contact } })
+    info (index) {
+      this.$router.push({ name: 'Contact', params: { contact: this.contacts[Object.keys(this.contacts)[index]] } })
     },
     add () {
       this.$router.push({ name: 'Contact', params: { add: true } })
     },
     setContact () {
       return null
-    },
-    getContacts () {
-    },
-    onKeyDown (event) {
-      switch (event.key) {
-        case 'ArrowDown':
-          this.focusIndex++
-          this.$refs.contactList.scrollBy({
-            top: this.$refs.items[0].offsetHeight,
-            left: 0
-          })
-          break
-        case 'ArrowUp':
-          this.focusIndex--
-          this.$refs.contactList.scrollBy({
-            top: -this.$refs.items[0].offsetHeight,
-            left: 0
-          })
-          break
-        // case 'Enter':
-        //   this.info(this.contacts[this.focusIndex])
-        //   break
-        // case 'SoftRight':
-        // case 'ArrowRight':
-        //   this.add()
-        //   break
-      }
-      this.focusInput(Object.keys(this.contacts).length)
-    },
-    focusInput (length) {
-      if (this.focusIndex >= length) {
-        this.focusIndex = 0
-        this.$refs.contactList.scrollTop = 0
-      } else if (this.focusIndex < 0) {
-        this.focusIndex = (length - 1)
-        this.$refs.contactList.scrollTop = this.$refs.contactList.scrollHeight
-      }
     }
   },
   mounted () {
@@ -102,15 +54,11 @@ export default {
       string: 'Back',
       fn: () => this.$router.push('/')
     }
-    store.keys.center.fn = () => this.$router.push({ name: 'Contact', params: { contact: this.contacts[Object.keys(this.contacts)[this.focusIndex]] } })
+    store.keys.center.fn = () => { return null }
     store.keys.right = {
       string: 'Add',
       fn: () => this.$router.push({ name: 'Contact', params: { add: true } })
     }
-    document.addEventListener('keydown', this.onKeyDown)
-  },
-  beforeDestroy () {
-    document.removeEventListener('keydown', this.onKeyDown)
   }
 }
 </script>

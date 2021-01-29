@@ -1,18 +1,20 @@
 <template>
-    <div id="options-menu">
+    <div id="options-menu" :style="listHeight">
       <div class="wrapper"></div>
-        <div class="header">
-            <label>options</label>
-        </div>
-        <div id="options-container" ref="optionList">
-            <div v-for="(option, index) in options" :key="index" :class="{ focus: index === focusIndex}" ref="items">
-                {{ option }}
-            </div>
-        </div>
+      <div class="header">
+          <label>options</label>
+      </div>
+      <div id="options-container" ref="optionList">
+          <div v-for="(option, index) in options" :key="index" class="item" :class="{ focus: index === focusIndex}" ref="items">
+              {{ option }}
+          </div>
+      </div>
     </div>
 </template>
 
 <script>
+import store from '@/js/store'
+
 export default {
   props: {
     options: Array
@@ -20,6 +22,12 @@ export default {
   data () {
     return {
       focusIndex: 0
+    }
+  },
+  computed: {
+    listHeight () {
+      const height = this.options.length > 3 ? 3 * 4.8 : this.options.length * 4.8
+      return { bottom: `${height + 3}rem` }
     }
   },
   methods: {
@@ -57,6 +65,10 @@ export default {
   },
   mounted () {
     document.addEventListener('keydown', this.onKeyDown)
+    store.keys.left = {
+      string: 'Back',
+      fn: () => this.$router.go(-1)
+    }
   },
   beforeDestroy () {
     document.removeEventListener('keydown', this.onKeyDown)
@@ -70,21 +82,27 @@ export default {
     width: 100%;
     height: 100%;
     z-index: 2;
-    top: 0;
-    left: 0;
     right: 0;
-    bottom: 3rem;
 }
 .wrapper {
   background-color: rgba(0, 0, 0, 0.7);
-  height: 70%;
+  height: 100%;
 }
 .header {
    background-color: grey;
 }
 #options-container {
   background-color: white;
-  height: calc(100% - 3rem);
+  max-height: calc(14.4rem);
+  overflow-y: auto;
+}
+.item {
+  height: 4.8rem;
+  font-size: 17px;
+  padding: 0 1rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }
 .focus {
     background-color: blue;

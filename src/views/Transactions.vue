@@ -7,23 +7,7 @@
       </div>
       <hr>
       <div v-if="transactions[0]" id="transaction-list" ref="txList">
-        <ListView :items="items"/>
-        <!-- <div v-for="(tx, index) in transactions" :key="index" id="transaction-items">
-          <div :class="{ focus: index === focusIndex}" :tabindex="index" @click="info(tx)" class="transaction-item"  ref="items">
-            <img src="https://www.flaticon.com/premium-icon/icons/svg/2936/2936758.svg">
-            <div id="transaction-text">
-              <label class="transaction-account" v-if="tx.tx.Account === account.Account">{{ getAccountName(tx.tx.Destination) }}</label>
-              <label class="transaction-account" v-if="tx.tx.Account !== account.Account">{{ getAccountName(tx.tx.Account) }}</label>
-              <label>{{ tx.tx.TransactionType }}</label>
-            </div>
-            <div class="transaction-amount" v-if="tx.tx.Amount || tx.meta.delivered_amount">
-              <label class="withdrawl" v-if="tx.tx.Account === account.Account">- {{ dropstoXRP(tx.tx.Amount) }}</label>
-              <label class="received" v-if="tx.tx.Account !== account.Account">+ {{ dropstoXRP(tx.meta.delivered_amount) }}</label>
-              <label class="currency" v-if="typeof tx.meta.delivered_amount === 'object'" >{{ tx.meta.delivered_amount.currency }}</label>
-              <label class="currency" v-if="typeof tx.meta.delivered_amount === 'string'">XRP</label>
-            </div>
-          </div>
-        </div> -->
+        <ListView @enter="info" :items="items"/>
       </div>
       <div v-if="account.error === 'actNotFound'">
         <p>This is an unactivated account, please send at least 20 XRP to this account to activate it!</p>
@@ -38,11 +22,6 @@ import ListView from '@/components/ListView.vue'
 export default {
   components: { ListView },
   name: 'Wallet',
-  data () {
-    return {
-      focusIndex: 0
-    }
-  },
   computed: {
     account () {
       return store.account
@@ -54,16 +33,40 @@ export default {
       const array = []
       store.tx.forEach(tx => {
         const withdrawl = tx.tx.Account === this.account.Account
-        array.push({
-          img: 'https://www.flaticon.com/premium-icon/icons/svg/2936/2936758.svg',
-          labels: [
-            withdrawl ? this.getAccountName(tx.tx.Destination) : this.getAccountName(tx.tx.Account),
-            tx.tx.TransactionType
-          ],
-          amount: {
-            value: withdrawl ? '-' + this.dropstoXRP(tx.tx.Amount) : '+' + this.dropstoXRP(tx.meta.delivered_amount)
-          }
-        })
+        switch (tx.tx.TransactionType) {
+          case 'Payment':
+            array.push({
+              img: 'https://www.flaticon.com/premium-icon/icons/svg/2936/2936758.svg',
+              labels: [
+                withdrawl ? this.getAccountName(tx.tx.Destination) : this.getAccountName(tx.tx.Account),
+                tx.tx.TransactionType
+              ],
+              amount: {
+                value: withdrawl ? '-' + this.dropstoXRP(tx.tx.Amount) : '+' + this.dropstoXRP(tx.meta.delivered_amount)
+              }
+            })
+            break
+          case 'TrustSet':
+            array.push({
+              img: 'https://www.flaticon.com/premium-icon/icons/svg/2936/2936758.svg',
+              labels: [
+                withdrawl ? this.getIssuerName(tx.tx.LimitAmount) + ' - ' + tx.tx.LimitAmount.currency : this.getAccountName(tx.tx.Account) + ' - ' + tx.tx.LimitAmount.currency,
+                tx.tx.TransactionType
+              ],
+              amount: {}
+            })
+            break
+          default:
+            array.push({
+              img: 'https://www.flaticon.com/premium-icon/icons/svg/2936/2936758.svg',
+              labels: [
+                withdrawl ? this.getAccountName(tx.tx.Destination) : this.getAccountName(tx.tx.Account),
+                tx.tx.TransactionType
+              ],
+              amount: {}
+            })
+            break
+        }
       })
       return array
     }
@@ -78,8 +81,17 @@ export default {
       const xrp = drops / 1000000
       return xrp
     },
-    info (tx) {
+    info (index) {
+      const tx = store.tx[index]
       this.$router.push({ name: 'transaction', params: { tx: tx } })
+    },
+    getIssuerName (LimitAmount) {
+      for (const issuer in store.curated_assets.details) {
+        try {
+          if (LimitAmount.issuer === store.curated_assets.details[issuer].currencies[LimitAmount.currency].issuer) return store.curated_assets.details[issuer].name
+        } catch (e) {}
+      }
+      return LimitAmount.issuer
     }
   },
   mounted () {
@@ -87,6 +99,7 @@ export default {
       string: 'Back',
       fn: () => this.$router.push('/')
     }
+    store.keys.center.fn = () => { return null }
     store.keys.right = {
       string: 'QR',
       fn: () => this.$router.push({ name: 'QRview', params: { string: this.account.Account } })

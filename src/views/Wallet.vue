@@ -59,7 +59,7 @@ export default {
         case 'Enter':
           switch (this.focusIndex) {
             case 0:
-              this.$notify({ group: 'foo', title: 'Multi wallet not implemented yet', type: 'warn' })
+              this.$router.push({ name: 'Accounts' })
               break
             case 1:
               this.$router.push({ name: 'QRview', params: { string: this.account.Account } })

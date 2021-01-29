@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <Header title="XUMM" style="height: 2.8rem"/>
-    <Setup @success="session = true" v-if="!session" style="height: calc(100% - (2.8rem + 3rem))"/>
+    <!-- <Setup @success="session = true" v-if="!session" style="height: calc(100% - (2.8rem + 3rem))"/> -->
     <router-view v-if="session" style="height: calc(100% - (2.8rem + 3rem))"/>
     <Softkey style="height: 3rem"/>
     <notifications group="foo" width="80%" position="bottom center" :max="1"/>
@@ -11,16 +11,15 @@
 <script>
 import Header from '@/components/Header.vue'
 import Softkey from '@/components/Softkey.vue'
-import Setup from '@/components/Setup.vue'
+// import Setup from '@/components/Setup.vue'
 
 import socket from '@/js/socket.js'
-// import store from '@/js/store.js'
 
 export default {
   components: {
     Header,
-    Softkey,
-    Setup
+    Softkey
+    // Setup
   },
   data () {
     return {

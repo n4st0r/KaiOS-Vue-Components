@@ -27,6 +27,7 @@
 import Vue from 'vue'
 import { Account, Utils } from 'xrpl-secret-numbers'
 import store from '@/js/store'
+// import dataStore from '@/js/dataStore.worker.js'
 
 export default {
   name: 'Import',
@@ -50,12 +51,25 @@ export default {
     }
   },
   methods: {
-    newAccount () {
+    async newAccount () {
       try {
         const account = new Account(this.secret)
+        console.log(navigator)
+        // this.$worker.run((arg) => {
+        //   return navigator.getDataStores('accounts')
+        // }).then(result => {
+        //   console.log(result)
+        // }).catch(e => {
+        //   console.error(e)
+        // })
+        // console.log(dataStore)
+        // const tst = await dataStore.addAccount(account)
+        // console.log(tst)
         this.$router.push({ name: 'Setup', params: { account: account, setup: true } })
         console.log(account)
-      } catch (e) {}
+      } catch (e) {
+        console.log(e)
+      }
     },
     next () {
       const index = this.focus
@@ -86,10 +100,6 @@ export default {
       switch (event.key) {
         case 'Enter':
           this.next()
-          break
-        default:
-          this.$notify({ group: 'foo', title: event.code })
-          console.log(event)
           break
       }
     }

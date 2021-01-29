@@ -1,32 +1,8 @@
 <template>
     <div>
       <p v-if="!lines">You have no trustlines!</p>
-      <ListView :items="items" />
-        <!-- <div tabindex="-1" v-for="(line, index) in lines" :key="index" ref="items">
-          <div class="trustline" v-if="getIssuerInfo(line.account, line.currency)">
-            <img :src="getIssuerInfo(line.account, line.currency).avatar">
-            <div class="issuer">
-                <label>{{ getIssuerInfo(line.account, line.currency).currencies[line.currency].name }}</label>
-                <label class="name">{{ getIssuerInfo(line.account, line.currency).name }}</label>
-            </div>
-            <div class="balance">
-              <img :src="getIssuerInfo(line.account, line.currency).currencies[line.currency].avatar">
-              <label>{{ line.balance }}</label>
-            </div>
-          </div>
-          <div v-else class="trustline">
-            <img src="https://www.flaticon.com/premium-icon/icons/svg/3425/3425009.svg">
-            <div class="issuer">
-                <label>{{ line.account }}</label>
-                <label class="name">{{ line.currency }}</label>
-            </div>
-            <div class="balance">
-              <img src="">
-              <label>{{ line.balance }}</label>
-            </div>
-          </div>
-        </div> -->
-        <OptionMenu @select="select" v-if="options" :options="['Delete Trustline']"/>
+      <ListView @enter="enter" :items="items" />
+      <OptionMenu @select="select" v-if="options" :options="['Delete Trustline']"/>
     </div>
 </template>
 
@@ -42,7 +18,8 @@ export default {
   },
   data () {
     return {
-      options: false
+      options: false,
+      focusIndex: Number
     }
   },
   computed: {
@@ -81,7 +58,16 @@ export default {
     }
   },
   methods: {
+    enter (index) {
+      this.focusIndex = index
+      this.options = true
+    },
     select (index) {
+      this.options = false
+      console.log(index)
+      if (index === 0) {
+        return this.$router.push({ name: 'TrustSet', params: { remove: true, trustline: store.account.lines[this.focusIndex] } })
+      }
       return null
     },
     getIssuerInfo (account, currency) {

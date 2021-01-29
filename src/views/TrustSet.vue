@@ -8,10 +8,10 @@
             </div>
             <hr>
             <div tabindex="-1" class="transaction-item" ref="input1">
-                <img :src="details[issuers[issuerName]].avatar">
+                <img :src="issuerAvatar">
                 <div class="issuer">
                     <label>Issuer</label>
-                    <label class="name">{{ issuers[issuerName] }}</label>
+                    <label class="name">{{ issuerName }}</label>
                     <label>{{ LimitAmount.issuer }}</label>
                 </div>
             </div>
@@ -21,14 +21,14 @@
                 <label>{{ LimitAmount.currency }}</label>
             </div>
             <hr>
-            <label>Limit: {{ LimitAmount.value }}</label>
+            <label>Max Limit: {{ LimitAmount.value }}</label>
             <hr>
             <label>Fee: UNDEFINED!!!</label>
             <hr>
             <input type="button" value="Send &amp; Sign" @click="signTransaction()" ref="input3">
         </div>
-        <OptionMenu @select="select" v-if="options" :options="items"/>
-        <Setup v-if="signing" :sign="signing" :transaction="Transaction"/>
+        <OptionMenu @select="select" v-if="options" :options="items" />
+        <Setup v-if="signing" :sign="signing" :transaction="Transaction" />
     </div>
 </template>
 
@@ -41,6 +41,10 @@ import OptionMenu from '../components/OptionMenu.vue'
 import Vue from 'vue'
 
 export default {
+  props: {
+    remove: Boolean,
+    trustline: Object
+  },
   components: {
     Setup,
     OptionMenu
@@ -50,7 +54,7 @@ export default {
       focusIndex: 0,
       options: false,
       signing: false,
-      issuerName: 0,
+      issuerIndex: 0,
       Transaction: {},
       TransactionType: 'TrustSet',
       Account: null,
@@ -62,9 +66,32 @@ export default {
     }
   },
   computed: {
+    getIssuerInfo () {
+      const account = this.LimitAmount.issuer
+      const currency = this.LimitAmount.currency
+      for (const issuer in store.curated_assets.details) {
+        try {
+          if (account === store.curated_assets.details[issuer].currencies[currency].issuer) return store.curated_assets.details[issuer]
+        } catch (e) {}
+      }
+      return null
+    },
+    issuerAvatar () {
+      if (this.trustline) {
+        if (this.getIssuerInfo) return this.getIssuerInfo.avatar
+        else return 'https://www.flaticon.com/premium-icon/icons/svg/3425/3425009.svg'
+      }
+      return store.curated_assets.details[this.issuers[this.issuerIndex]].avatar
+    },
+    issuerName () {
+      if (this.trustline) {
+        if (this.getIssuerInfo) return this.getIssuerInfo.name
+        else return null
+      } else return this.issuers[this.issuerIndex]
+    },
     items () {
       if (this.focusIndex === 1) return Object.keys(this.details)
-      if (this.focusIndex === 2) return Object.keys(this.details[this.issuers[this.issuerName]].currencies)
+      if (this.focusIndex === 2) return Object.keys(this.details[this.issuers[this.issuerIndex]].currencies)
       return null
     },
     issuers () {
@@ -81,13 +108,14 @@ export default {
     select (index) {
       console.log(index)
       this.options = false
-      if (this.focusIndex === 1) this.issuerName = index
+      if (this.focusIndex === 1) this.issuerIndex = index
       if (this.focusIndex === 2) {
         Vue.set(this.LimitAmount, 'currency', this.currencies[index])
-        Vue.set(this.LimitAmount, 'issuer', this.details[this.issuers[this.issuerName]].currencies[this.LimitAmount.currency].issuer)
+        Vue.set(this.LimitAmount, 'issuer', this.details[this.issuers[this.issuerIndex]].currencies[this.LimitAmount.currency].issuer)
       }
     },
     signTransaction () {
+      if (this.remove) this.$notify({ group: 'foo', title: 'Sign to remove TrustLine', type: 'warn' })
       const transaction = {
         TransactionType: this.TransactionType,
         Account: this.Account,
@@ -95,7 +123,8 @@ export default {
           currency: this.LimitAmount.currency,
           issuer: this.LimitAmount.issuer,
           value: this.LimitAmount.value
-        }
+        },
+        Flags: '2149711872'
       }
       this.Transaction = transaction
       this.signing = true
@@ -139,6 +168,13 @@ export default {
     document.addEventListener('keydown', this.onKeyDown)
     this.Account = socket.getPublicAddress()
     this.$refs.input0.focus()
+    if (this.remove) {
+      this.LimitAmount = {
+        issuer: this.trustline.account,
+        currency: this.trustline.currency,
+        value: '0'
+      }
+    }
   },
   beforeDestroy () {
     document.removeEventListener('keydown', this.onKeyDown)

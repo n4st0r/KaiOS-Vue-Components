@@ -18,6 +18,7 @@ const store = Vue.observable({
       fn: () => { return null }
     }
   },
+  accountList: [],
   account: {},
   tx: [],
   contacts: {

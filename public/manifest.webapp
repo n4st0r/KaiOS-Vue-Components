@@ -46,5 +46,11 @@
       "icons": [{ "src": "/images/tomorrow.png", "sizes": "192x192" }]
     }
   ],
-  "default_locale": "en-US"
+  "default_locale": "en-US",
+  "datastores-owned": {
+    "accounts": {
+      "access": "readwrite",
+      "description": "XRP accounts"
+    }
+  }
 }
