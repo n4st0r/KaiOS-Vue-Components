@@ -6,11 +6,11 @@
             <li v-for="(row, index) in num" :key="index">{{ row }}</li>
         </ol>
         <div class="container">
+      <!--                   type="number" -->
           <input  v-model="num[focus]"
                   oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
                   placeholder="XXXXXX"
                   maxlength="6"
-                  type="number"
                   ref="importInput"
                   @click="next()"
                   id="input-secret"
@@ -27,7 +27,6 @@
 import Vue from 'vue'
 import { Account, Utils } from 'xrpl-secret-numbers'
 import store from '@/js/store'
-// import dataStore from '@/js/dataStore.worker.js'
 
 export default {
   name: 'Import',
@@ -54,17 +53,6 @@ export default {
     async newAccount () {
       try {
         const account = new Account(this.secret)
-        console.log(navigator)
-        // this.$worker.run((arg) => {
-        //   return navigator.getDataStores('accounts')
-        // }).then(result => {
-        //   console.log(result)
-        // }).catch(e => {
-        //   console.error(e)
-        // })
-        // console.log(dataStore)
-        // const tst = await dataStore.addAccount(account)
-        // console.log(tst)
         this.$router.push({ name: 'Setup', params: { account: account, setup: true } })
         console.log(account)
       } catch (e) {
@@ -73,7 +61,9 @@ export default {
     },
     next () {
       const index = this.focus
-      if (this.num[index].length < 6) return
+      if (this.num[index].length < 6) {
+        return this.$notify({ group: 'foo', title: 'Each row has 6 numbers', type: 'error' })
+      }
       this.error = false
       if (!Utils.checkChecksum(index, this.num[index])) {
         this.$notify({ group: 'foo', title: 'Invalid numbers', type: 'error' })
@@ -97,30 +87,56 @@ export default {
       } else if (this.num[this.focus].length === 6) this.focus++
     },
     onKeyDown (event) {
+      if (event.which === 8) {
+        event.preventDefault()
+      }
+
+      if (Number.isInteger(parseInt(event.key))) {
+        if (this.num[this.focus].length < 6) {
+          Vue.set(this.num, this.focus, this.num[this.focus] + event.key)
+        }
+      }
+
       switch (event.key) {
         case 'Enter':
           this.next()
           break
+        case 'Backspace': {
+          event.preventDefault()
+          const newValue = this.num[this.focus].slice(0, -1)
+          Vue.set(this.num, this.focus, newValue)
+          break
+        }
       }
     }
   },
   mounted () {
     // TODO DELTE ME! Only for test purposes
     // this.num = this.account.secret
-    document.getElementsByClassName('prevent').forEach(element => {
-      element.addEventListener('keydown', e => {
-        if (e.which === 38 || e.which === 40) {
-          e.preventDefault()
-        }
-      })
-    })
+    // document.getElementsByClassName('prevent').forEach(element => {
+    //   element.addEventListener('keydown', e => {
+    //     if (e.which === 38 || e.which === 40) {
+    //       e.preventDefault()
+    //     }
+    //   })
+    // })
 
     store.keys.left = {
       string: 'Back',
       fn: () => this.$router.go(-1)
     }
-    this.$refs.importInput.focus()
+
+    // document.bind('keydown keypress', e => {
+    //   if (e.which === 8) { // 8 == backspace
+    //     if (e.target.tagName || e.target.disabled || e.target.readOnly) {
+    //       e.preventDefault()
+    //     }
+    //   }
+    // })
+
+    // this.$refs.importInput.focus()
     document.addEventListener('keydown', this.onKeyDown)
+
     store.keys.right.string = 'delete'
     store.keys.right.fn = () => {
       var newValue = this.num[this.focus].slice(0, -1)

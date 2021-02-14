@@ -27,7 +27,7 @@ export default {
         case 'Enter':
           this.key.center.fn()
           break
-        // case 'ArrowRight':
+        case 'ArrowRight':
         case 'SoftRight':
           this.key.right.fn()
           break

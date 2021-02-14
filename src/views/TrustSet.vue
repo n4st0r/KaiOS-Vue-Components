@@ -2,6 +2,7 @@
     <div>
         <div v-if="!signing" class="container">
             <label>{{ TransactionType }}</label>
+            <label v-if="remove">Delete Trustline</label>
             <div tabindex="-1" class="account" ref="input0">
               <label>No name yet</label>
               <label>{{ Account }}</label>
@@ -27,8 +28,8 @@
             <hr>
             <input type="button" value="Send &amp; Sign" @click="signTransaction()" ref="input3">
         </div>
-        <OptionMenu @select="select" v-if="options" :options="items" />
-        <Setup v-if="signing" :sign="signing" :transaction="Transaction" />
+        <OptionMenu @close="optionsActive = false" @select="select" v-if="optionsActive" :options="options"/>
+        <Setup v-if="signing" :sign="signing" :transaction="Transaction"/>
     </div>
 </template>
 
@@ -52,7 +53,8 @@ export default {
   data () {
     return {
       focusIndex: 0,
-      options: false,
+      optionsActive: false,
+      options: Array,
       signing: false,
       issuerIndex: 0,
       Transaction: {},
@@ -106,13 +108,12 @@ export default {
   },
   methods: {
     select (index) {
-      console.log(index)
-      this.options = false
-      if (this.focusIndex === 1) this.issuerIndex = index
-      if (this.focusIndex === 2) {
-        Vue.set(this.LimitAmount, 'currency', this.currencies[index])
-        Vue.set(this.LimitAmount, 'issuer', this.details[this.issuers[this.issuerIndex]].currencies[this.LimitAmount.currency].issuer)
-      }
+      this.optionsActive = false
+      // if (this.focusIndex === 1) this.issuerIndex = index
+      // if (this.focusIndex === 2) {
+      //   Vue.set(this.LimitAmount, 'currency', this.currencies[index])
+      //   Vue.set(this.LimitAmount, 'issuer', this.details[this.issuers[this.issuerIndex]].currencies[this.LimitAmount.currency].issuer)
+      // }
     },
     signTransaction () {
       if (this.remove) this.$notify({ group: 'foo', title: 'Sign to remove TrustLine', type: 'warn' })
@@ -130,7 +131,7 @@ export default {
       this.signing = true
     },
     onKeyDown (event) {
-      if (this.options) return
+      if (this.optionsActive) return
       switch (event.key) {
         case 'ArrowDown':
           this.focusIndex++
@@ -141,15 +142,41 @@ export default {
           this.focusInput(Object.keys(this.$refs).length)
           break
         case 'Enter':
+          if (this.remove) return
           switch (this.focusIndex) {
             case 0:
               this.$notify({ group: 'foo', title: 'Multi wallet not implemented yet', type: 'warn' })
               break
-            case 1:
-              this.options = true
+            case 1: {
+              const arr = []
+              Object.keys(this.details).forEach((el, index) => {
+                const obj = {
+                  text: el,
+                  fn: () => { this.issuerIndex = index }
+                }
+                arr.push(obj)
+              })
+              this.options = arr
+              this.optionsActive = true
               break
-            case 2:
-              this.options = true
+            }
+            case 2: {
+              const arr = []
+              Object.keys(this.details[this.issuers[this.issuerIndex]].currencies).forEach((el, index) => {
+                const obj = {
+                  text: el,
+                  fn: () => {
+                    console.log(el)
+                    Vue.set(this.LimitAmount, 'currency', this.details[this.issuers[this.issuerIndex]].currencies[el].currency)
+                    Vue.set(this.LimitAmount, 'issuer', this.details[this.issuers[this.issuerIndex]].currencies[this.LimitAmount.currency].issuer)
+                  }
+                }
+                arr.push(obj)
+              })
+              this.options = arr
+              this.optionsActive = true
+              break
+            }
           }
           break
       }
@@ -183,6 +210,10 @@ export default {
 </script>
 
 <style scoped>
+.container {
+  display: flex;
+  flex-direction: column;
+}
 .account {
   display: flex;
   flex-direction: column
@@ -205,5 +236,8 @@ export default {
 #asset {
   display: flex;
   flex-direction: column;
+}
+hr {
+  width: 98%;
 }
 </style>

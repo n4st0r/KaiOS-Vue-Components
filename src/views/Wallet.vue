@@ -92,7 +92,7 @@ export default {
     store.keys.center.fn = () => { return null }
     store.keys.right = {
       string: 'Scan QR',
-      fn: () => this.$router.push({ name: 'QR ' })
+      fn: () => this.$router.push({ name: 'QR' })
     }
     document.addEventListener('keydown', this.onKeyDown)
     this.$refs.input0.focus()

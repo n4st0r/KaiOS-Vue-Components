@@ -6,7 +6,7 @@
       </div>
       <div id="options-container" ref="optionList">
           <div v-for="(option, index) in options" :key="index" class="item" :class="{ focus: index === focusIndex}" ref="items">
-              {{ option }}
+              {{ option.text }}
           </div>
       </div>
     </div>
@@ -21,7 +21,8 @@ export default {
   },
   data () {
     return {
-      focusIndex: 0
+      focusIndex: 0,
+      keys: Object
     }
   },
   computed: {
@@ -48,6 +49,8 @@ export default {
           })
           break
         case 'Enter':
+          console.log(this.options[this.focusIndex].fn)
+          this.options[this.focusIndex].fn()
           this.$emit('select', this.focusIndex)
           break
       }
@@ -65,13 +68,23 @@ export default {
   },
   mounted () {
     document.addEventListener('keydown', this.onKeyDown)
+    this.keys = {
+      left: store.keys.left,
+      center: store.keys.center,
+      right: store.keys.right
+    }
     store.keys.left = {
-      string: 'Back',
-      fn: () => this.$router.go(-1)
+      string: 'Close',
+      fn: () => this.$emit('close')
+    }
+    store.keys.right = {
+      string: '',
+      fn: () => { return null }
     }
   },
   beforeDestroy () {
     document.removeEventListener('keydown', this.onKeyDown)
+    store.keys = this.keys
   }
 }
 </script>

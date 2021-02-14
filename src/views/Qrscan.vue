@@ -6,14 +6,13 @@
       :fps="10"
       @result="onScan"
     />
-    {{ string }}
   </div>
 </template>
 
 <script>
 import store from '@/js/store'
 import QrcodeScanner from '@/components/QrcodeScanner.vue'
-import { StringTypeDetector } from 'xumm-string-decode'
+import { StringTypeDetector, StringDecoder } from 'xumm-string-decode'
 
 export default {
   name: 'qrscanner',
@@ -29,7 +28,9 @@ export default {
       console.log('scanning')
 
       const detected = new StringTypeDetector(string)
-      console.log(detected)
+      console.log(detected.getTypeName())
+      const decoded = new StringDecoder(detected)
+      console.log(decoded.getXrplDestination())
       // this.string = detected
 
       // const detected = new xsd.StringTypeDetector('rwietsevLFg8XSmG3bEZzFein1g8RBqWDZ')

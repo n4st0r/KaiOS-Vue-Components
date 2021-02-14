@@ -2,7 +2,7 @@
     <div>
       <p v-if="!lines">You have no trustlines!</p>
       <ListView @enter="enter" :items="items" />
-      <OptionMenu @select="select" v-if="options" :options="['Delete Trustline']"/>
+      <OptionMenu @close="optionsActive = false" @select="select" v-if="optionsActive" :options="options"/>
     </div>
 </template>
 
@@ -18,7 +18,8 @@ export default {
   },
   data () {
     return {
-      options: false,
+      options: Array,
+      optionsActive: false,
       focusIndex: Number
     }
   },
@@ -59,16 +60,13 @@ export default {
   },
   methods: {
     enter (index) {
+      console.log('enter')
+      if (!this.optionsActive) this.options = [{ text: 'Delete Trustline', fn: () => { this.$router.push({ name: 'TrustSet', params: { remove: true, trustline: store.account.lines[this.focusIndex] } }) } }]
       this.focusIndex = index
-      this.options = true
+      this.optionsActive = true
     },
     select (index) {
-      this.options = false
-      console.log(index)
-      if (index === 0) {
-        return this.$router.push({ name: 'TrustSet', params: { remove: true, trustline: store.account.lines[this.focusIndex] } })
-      }
-      return null
+      this.optionsActive = false
     },
     getIssuerInfo (account, currency) {
       for (const issuer in store.curated_assets.details) {

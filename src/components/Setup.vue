@@ -64,8 +64,7 @@ export default {
           if (this.pin[0] === this.pin[1]) {
             const address = this.account.account.address
             const secret = this.encrypt(this.account.account.familySeed, this.pin[0])
-            socket.clear()
-            dataStore.setAccount(secret, address)
+            dataStore.addAccount(secret, address)
             this.$notify({ group: 'foo', title: 'Created an Account!', type: 'success' })
             socket.init()
             setTimeout(() => this.$router.push('/'), 2000)
@@ -83,7 +82,9 @@ export default {
       } else {
         let seed
         try {
-          seed = this.decrypt(socket.getSecretKey(), this.pin[this.count])
+          const secret = await dataStore.getAccountSecret()
+          console.log(secret)
+          seed = this.decrypt(secret, this.pin[this.count])
           if (dataStore.getPinTries()) dataStore.resetPinCount()
         } catch (e) {
           console.log('Error deriving public address')
@@ -113,20 +114,11 @@ export default {
       setTimeout(() => this.count++, 500)
     },
     decrypt (input, secret) {
-      console.log(`Input: ${input}, secret: ${secret}`)
-      const key = this.$CryptoJS.PBKDF2(secret, this.$CryptoJS.enc.Hex.parse(input.substr(0, 32)) /* Salt */, { keySize: 256 / 32, iterations: 100 })
-      const output = this.$CryptoJS.AES.decrypt(input.substring(64) /* encrypted */, key, { iv: this.$CryptoJS.enc.Hex.parse(input.substr(32, 32)) /* iv */, padding: this.$CryptoJS.pad.Pkcs7, mode: this.$CryptoJS.mode.CBC }).toString(this.$CryptoJS.enc.Utf8)
-      if (!output) throw new Error('The secret did not unlock the string')
-      return output
+      return dataStore.decrypt(input, secret)
     },
     encrypt (input, secret) {
+      return dataStore.encrypt(input, secret)
       // https://gist.github.com/WietseWind/fd8b0b9e888f58a747e18b31636ad423
-      console.log(`Input: ${input}, secret: ${secret}`)
-      const salt = this.$CryptoJS.lib.WordArray.random(128 / 8)
-      const iv = this.$CryptoJS.lib.WordArray.random(128 / 8)
-      const encrypted = this.$CryptoJS.AES.encrypt(input, this.$CryptoJS.PBKDF2(secret, salt, { keySize: 256 / 32, iterations: 100 }) /* key */, { iv: iv, padding: this.$CryptoJS.pad.Pkcs7, mode: this.$CryptoJS.mode.CBC })
-      const output = salt.toString() + iv.toString() + encrypted.toString()
-      return output
     },
     deleteAccount () {
       dataStore.clearAllData()
@@ -139,7 +131,7 @@ export default {
       fn: () => Vue.set(this.pin, this.count, this.pin[this.count].slice(0, -1))
     }
     if (!this.setup) {
-      const tries = localStorage.tries
+      const tries = dataStore.getPinTries()
       if (tries && tries >= 1) {
         this.count = tries
         this.incorrect = true

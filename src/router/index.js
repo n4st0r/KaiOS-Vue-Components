@@ -32,6 +32,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "QRScanner" */'../views/Qrscan.vue')
   },
   {
+    path: '/Init',
+    name: 'Init',
+    component: () => import(/* webpackChunkName: "Init" */'../views/Init.vue')
+  },
+  {
     path: '/Setup',
     name: 'Setup',
     component: () => import(/* webpackChunkName: "Setup" */'../components/Setup.vue'),

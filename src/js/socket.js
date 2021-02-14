@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import RippledWsClient from 'rippled-ws-client'
-// import RippledWsClientSign from 'rippled-ws-client-sign'
+import RippledWsClientSign from 'rippled-ws-client-sign'
 // // import RippleKeypairs from 'ripple-keypairs'
 import store from './store.js'
 // // const url = 'wss://s.devnet.rippletest.net:51233'
@@ -99,7 +99,6 @@ const setAccountTx = async (account) => {
 // }
 
 const setAccountInfo = async (account) => {
-  account = 'rDXJt3qZ62HtfTv728Vbuoq9BdAihYJZZd'
   const msg = await command({
     command: 'account_info',
     strict: true,
@@ -168,13 +167,12 @@ const getSecretKey = () => {
 const signTransaction = (transaction, seed) => {
   console.log(transaction)
   return new Promise((resolve, reject) => {
-    resolve()
-    // new RippledWsClientSign(transaction, seed, server).then(signedTX => {
-    //   resolve(signedTX)
-    // }).catch(error => {
-    //   console.log(error)
-    //   reject(error)
-    // })
+    new RippledWsClientSign(transaction, seed, server).then(signedTX => {
+      resolve(signedTX)
+    }).catch(error => {
+      console.error(error)
+      reject(error)
+    })
   })
 }
 
