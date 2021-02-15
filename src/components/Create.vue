@@ -1,6 +1,7 @@
 <template>
     <div style="height: 100%">
-      <input id="createAccount" type="button" :value="'Create XRP Account'" ref="createBtn">
+      <Spinner v-if="isActive" />
+      <!-- <input id="createAccount" type="button" :value="'Create XRP Account'" ref="createBtn"> -->
       <div v-if="obj.account && !isActive" class="container">
         <label>{{ obj.account.address }}</label>
         <div class="row">
@@ -18,14 +19,17 @@
 import { Account } from 'xrpl-secret-numbers'
 import VueQrcode from '@chenfengyuan/vue-qrcode'
 import store from '@/js/store'
+import Spinner from './Spinner.vue'
 
 export default {
   name: 'Create',
   components: {
-    VueQrcode
+    VueQrcode,
+    Spinner
   },
   data () {
     return {
+      busy: true,
       isActive: true,
       obj: {},
       test: null
@@ -34,12 +38,14 @@ export default {
   methods: {
     createAccount () {
       const account = new Account()
-      this.isActive = !this.isActive
+      this.isActive = false
       this.obj = account
       console.log(account)
     }
   },
   mounted () {
+    this.createAccount()
+
     store.keys.left = {
       string: 'Back',
       fn: () => this.$router.go(-1)
@@ -50,6 +56,10 @@ export default {
       } else {
         this.$router.push({ name: 'Import', params: { account: this.obj } })
       }
+    }
+    store.keys.right = {
+      string: 'Again',
+      fn: () => { this.createAccount() }
     }
     if (this.$refs.createBtn !== undefined) this.$refs.createBtn.focus()
   }

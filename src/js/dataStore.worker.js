@@ -1,7 +1,6 @@
 // .worker.js
 import Vue from 'vue'
 import localforage from 'localforage'
-// import store from '@/js/store.js'
 import socket from '@/js/socket.js'
 import store from './store'
 
@@ -120,9 +119,21 @@ const resetPinCount = async () => {
 const deleteAccount = async (account) => {
   try {
     await localforage.removeItem(account)
-    if (localStorage.public === account) location.reload()
-    else 
-
+    if (localStorage.public === account) {
+      const arr = await getAccounts()
+      if (arr.length > 0) {
+        const obj = await getAccount(arr[0])
+        await setAccountActive(obj.public, obj.secret)
+      } else {
+        location.reload()
+      }
+    } else {
+      const array = store.accountList
+      const index = array.indexOf(account)
+      if (index > -1) {
+        array.splice(index, 1)
+      }
+    }
     Vue.notify({ group: 'foo', type: 'success', title: 'Success', text: 'Deleting an account' })
   } catch (e) {
     Vue.notify({ group: 'foo', type: 'error', title: 'Getting an error', text: 'when deleting' })
