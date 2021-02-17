@@ -48,11 +48,17 @@ export default {
     height: 100%;
     display: flex;
     flex-direction: column;
+    align-items: center;
 }
 h1 {
     margin: 0;
 }
 p {
     margin: 0;
+    text-align: justify;
+    padding: 5px 5px;
+}
+Button {
+  /* width: 100%; */
 }
 </style>

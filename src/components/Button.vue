@@ -12,6 +12,7 @@ export default {
 
 <style scoped>
 button {
+    width: calc(100% - 2rem);
     height: 3.6rem;
     margin: 1rem;
     background-color: blue;

@@ -34,13 +34,18 @@ export default {
   },
   mounted () {
     const video = this.$refs['cam-view']
-
     setInterval(this.capture, 200)
-
-    navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: 'environment' } }).then(stream => {
+    navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: 'environment', width: { max: 240 } } }).then(stream => {
       video.srcObject = stream
       video.setAttribute('playsinline', true)
       video.play()
+    })
+  },
+  beforeDestroy () {
+    const video = this.$refs['cam-view']
+    video.srcObject.getVideoTracks().forEach(track => {
+      track.stop()
+      video.srcObject.removeTrack(track)
     })
   }
 }

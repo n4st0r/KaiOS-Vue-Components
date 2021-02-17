@@ -1,11 +1,12 @@
 <template>
-    <div>
+    <div class="container">
       <label v-if="account">{{ account.account.address }}</label>
-      <div class="container">
+      <label v-else>Enter your secret numbers</label>
+      <div class="row">
         <ol>
             <li v-for="(row, index) in num" :key="index">{{ row }}</li>
         </ol>
-        <div class="container">
+        <div>
       <!--                   type="number" -->
           <input  v-model="num[focus]"
                   oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"
@@ -19,7 +20,6 @@
           <input id="save-button" type="button" @click="newAccount()" value="Save" :disabled="!ready" ref="save">
         </div>
       </div>
-      {{ account }}
     </div>
 </template>
 
@@ -125,15 +125,6 @@ export default {
       string: 'Back',
       fn: () => this.$router.go(-1)
     }
-
-    // document.bind('keydown keypress', e => {
-    //   if (e.which === 8) { // 8 == backspace
-    //     if (e.target.tagName || e.target.disabled || e.target.readOnly) {
-    //       e.preventDefault()
-    //     }
-    //   }
-    // })
-
     // this.$refs.importInput.focus()
     document.addEventListener('keydown', this.onKeyDown)
 
@@ -151,15 +142,21 @@ export default {
 
 <style scoped>
 .container {
+  height: 100%;
   display: flex;
-  justify-content: space-around;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+}
+.row {
+  display: flex;
+  flex-direction: row;
   align-items: center;
 }
 li {
   width: 60px;
 }
 label {
-  width: 60px;
 }
 #input-secret {
   width: 60px;
