@@ -7,7 +7,7 @@
         <hr>
         <fieldset>
             <label>Address:</label>
-            <input v-model="contactobj.account" class="prevent" placeholder="R Address" ref="input1">
+            <input v-model="contactobj.public" class="prevent" placeholder="R Address" ref="input1">
             <input v-model="contactobj.tag" class="prevent" type="number" placeholder="Destination Tag" ref="input2">
         </fieldset>
         <hr>
@@ -23,6 +23,7 @@
 import store from '@/js/store'
 import Vue from 'vue'
 import { Encode } from 'xrpl-tagged-address-codec'
+import dataStore from '@/js/dataStore.worker.js'
 
 export default {
   props: ['contact', 'add'],
@@ -31,26 +32,33 @@ export default {
       focusIndex: 0,
       contactobj: {
         name: null,
-        account: null,
+        public: null,
         tag: null
       }
     }
   },
   methods: {
-    deleteContact () {
-      this.$notify({ group: 'foo', title: 'TODO Delete contact in DataStore', type: 'warn' })
-    },
-    setContact () {
+    async deleteContact () {
       try {
-        Encode({
-          account: this.contactobj.account,
-          tag: this.contactobj.tag,
-          test: false
-        })
-        this.$notify({ group: 'foo', title: 'TODO: Save user in datastore', type: 'success' })
-        console.log(this.contactobj)
+        await dataStore.deleteContact(this.contactobj.public)
+        this.$router.push('/Contacts')
       } catch (e) {
-        this.$notify({ group: 'foo', title: 'This is not an XRP Account', type: 'error' })
+        this.$notify({ group: 'foo', title: 'Could not delete contact', type: 'error' })
+        console.error(e)
+      }
+    },
+    async setContact () {
+      try {
+        if (this.contact) {
+          await dataStore.setContact(this.contactobj.public, this.contactobj.name, this.contactobj.tag, true)
+          Vue.notify({ group: 'foo', type: 'success', title: 'Updated a Contact' })
+        } else {
+          await dataStore.setContact(this.contactobj.public, this.contactobj.name, this.contactobj.tag, false)
+          Vue.notify({ group: 'foo', type: 'success', title: 'Added a Contact' })
+        }
+        this.$router.push('/Contacts')
+      } catch (e) {
+        this.$notify({ group: 'foo', title: e, type: 'error' })
       }
     },
     onKeyDown (event) {
@@ -80,6 +88,18 @@ export default {
       fn: () => this.$router.go(-1)
     }
     store.keys.center.fn = () => {
+      if (this.focusIndex >= 3) {
+        try {
+          Encode({
+            account: this.contactobj.public,
+            tag: this.contactobj.tag,
+            test: false
+          })
+        } catch (e) {
+          return this.$notify({ group: 'foo', title: 'This is not an XRP Account', type: 'error' })
+        }
+      }
+
       switch (this.focusIndex) {
         case 3:
           this.deleteContact()
@@ -88,7 +108,7 @@ export default {
           this.setContact()
           break
         case 5:
-          this.$router.push({ name: 'Send', params: { account: this.contactobj.account, tag: this.contactobj.tag } })
+          this.$router.push({ name: 'Send', params: { account: this.contactobj.public, tag: this.contactobj.tag } })
       }
     }
     store.keys.right = {
@@ -101,7 +121,7 @@ export default {
           return Vue.set(this.contactobj, 'name', newValue)
         }
         if (this.focusIndex === 1) {
-          newValue = this.contactobj.account.slice(0, -1)
+          newValue = this.contactobj.public.slice(0, -1)
           return Vue.set(this.contactobj, 'account', newValue)
         }
         if (this.focusIndex === 2) {

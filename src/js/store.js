@@ -22,16 +22,16 @@ const store = Vue.observable({
   account: {},
   tx: [],
   contacts: {
-    rXXXXXXXXXXX: {
-      account: 'rXXXXXXXXXXX',
-      name: 'Ted',
-      tag: ''
-    },
-    rh5juM8LsHPw5doRJopaihzqn2pJnRVBNr: {
-      account: 'rh5juM8LsHPw5doRJopaihzqn2pJnRVBNr',
-      name: 'Antonio',
-      tag: 123456
-    }
+    // rXXXXXXXXXXX: {
+    //   account: 'rXXXXXXXXXXX',
+    //   name: 'Ted',
+    //   tag: ''
+    // },
+    // rh5juM8LsHPw5doRJopaihzqn2pJnRVBNr: {
+    //   account: 'rh5juM8LsHPw5doRJopaihzqn2pJnRVBNr',
+    //   name: 'Antonio',
+    //   tag: 123456
+    // }
   },
   curated_assets: {
     'issuers': [

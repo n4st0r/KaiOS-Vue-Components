@@ -20,7 +20,6 @@ const getAccounts = async () => {
     obj = JSON.parse(obj)
     if (obj.type === 'account') array.push(key)
   })
-  console.log(array)
   return array
   // return new Promise((resolve, reject) => {
   //   navigator.getDataStores('accounts').then(stores => {
@@ -140,17 +139,41 @@ const deleteAccount = async (account) => {
   }
 }
 
-// const setContact = async () => {
+const setContact = async (account, name, tag, isUpdate) => {
+  if (await getAccount(account) && !isUpdate) {
+    throw new Error('Account excists')
+  } else {
+    const contact = {
+      type: 'contact',
+      public: account,
+      tag: tag,
+      name: name
+    }
+    try {
+      await localforage.setItem(account, JSON.stringify(contact))
+      store.contacts[account] = contact
+      return contact
+    } catch (e) {
+      throw new Error(e)
+    }
+  }
+}
 
-// }
+const deleteContact = async (account) => {
+  try {
+    await localforage.removeItem(account)
+    delete store.contacts[account]
+  } catch (e) {
+    throw new Error(e)
+  }
+}
 
-// const deleteContact = async () => {
-
-// }
-
-// const getContacts = async () => {
-
-// }
+const getContacts = async () => {
+  await localforage.iterate((obj, key, number) => {
+    obj = JSON.parse(obj)
+    if (obj.type === 'contact') store.contacts[key] = obj
+  })
+}
 
 export default {
   getAccount,
@@ -164,5 +187,8 @@ export default {
   decrypt,
   encrypt,
   deleteAccount,
-  getAccountSecret
+  getAccountSecret,
+  setContact,
+  deleteContact,
+  getContacts
 }

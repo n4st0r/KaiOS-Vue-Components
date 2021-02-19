@@ -9,6 +9,7 @@
 
 <script>
 import store from '@/js/store.js'
+import dataStore from '@/js/dataStore.worker.js'
 import ListView from '../components/ListView.vue'
 
 export default {
@@ -59,6 +60,7 @@ export default {
       string: 'Add',
       fn: () => this.$router.push({ name: 'Contact', params: { add: true } })
     }
+    dataStore.getContacts()
   }
 }
 </script>
