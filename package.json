@@ -22,7 +22,7 @@
     "vue-router": "^3.2.0",
     "xrpl-secret-numbers": "^0.3.1",
     "xrpl-tagged-address-codec": "^0.2.1",
-    "xumm-string-decode": "^0.4.11"
+    "xumm-string-decode": "^0.7.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
